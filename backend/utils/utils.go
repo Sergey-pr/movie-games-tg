@@ -1,0 +1,44 @@
+package utils
+
+import (
+	"database/sql/driver"
+	"encoding/json"
+	"fmt"
+)
+
+func JsonScan[T any](src interface{}, b T) error {
+	switch src := src.(type) {
+	case []byte:
+		if string(src) == "null" {
+			src = []byte("{}")
+		}
+		return json.Unmarshal(src, b)
+	case string:
+		return json.Unmarshal([]byte(src), b)
+	case nil:
+		return nil
+	}
+	return fmt.Errorf("cannot convert %T", src)
+}
+
+type JSONB []interface{}
+
+func (b *JSONB) Scan(src interface{}) error {
+	return JsonScan(src, b)
+}
+
+func (b JSONB) Value() (driver.Value, error) {
+	if b == nil {
+		return json.Marshal([]interface{}{})
+	}
+	return json.Marshal(b)
+}
+
+func (b *JSONB) AsFloatSlice() []float64 {
+	arr := make([]float64, 0)
+	for _, value := range *b {
+		arr = append(arr, value.(float64))
+	}
+
+	return arr
+}

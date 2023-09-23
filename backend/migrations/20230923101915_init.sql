@@ -6,7 +6,7 @@ CREATE TABLE users
     id              serial          PRIMARY KEY,
     tg_id           int             NOT NULL,
     name            varchar(250)    NOT NULL,
-    language        varchar(50),
+    language        varchar(50)     NOT NULL,
     answered_cards  jsonb
 );
 

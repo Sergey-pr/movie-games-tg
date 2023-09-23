@@ -5,6 +5,7 @@ import (
 	"github.com/Sergey-pr/movie-games-tg/config"
 	"github.com/doug-martin/goqu/v9"
 	_ "github.com/doug-martin/goqu/v9/dialect/postgres"
+	_ "github.com/lib/pq"
 	"log"
 )
 
@@ -17,7 +18,7 @@ func connectPostgresql(dns ...string) *goqu.Database {
 
 	dialect := goqu.Dialect("postgres")
 
-	pgDb, err := sql.Open("pqHooked", dns[0])
+	pgDb, err := sql.Open("postgres", dns[0])
 	if err != nil {
 		log.Fatalln(err)
 	}

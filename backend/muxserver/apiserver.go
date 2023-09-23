@@ -2,6 +2,7 @@ package muxserver
 
 import (
 	"context"
+	"github.com/Sergey-pr/movie-games-tg/muxserver/handlers"
 	"log"
 	"net/http"
 	"os"
@@ -23,9 +24,13 @@ type ApiServer struct {
 func NewApiServer() *ApiServer {
 
 	rootRouter := mux.NewRouter().StrictSlash(true)
-	rootRouter.Use(authMiddleware)
+	router := rootRouter.PathPrefix("/api").Subrouter()
 
-	_ = rootRouter.PathPrefix("/api").Subrouter()
+	public := router.PathPrefix("/public").Subrouter()
+	public.HandleFunc("/login/", handlers.Login).Methods(http.MethodPost).Name("public:login")
+
+	private := router.PathPrefix("").Subrouter()
+	private.Use(authMiddleware)
 
 	return &ApiServer{
 		name:   "API",

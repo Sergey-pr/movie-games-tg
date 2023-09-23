@@ -18,6 +18,9 @@ type config struct {
 	BaseUrl         string `envconfig:"BASE_URL" required:"true" default:"http://localhost:8888/api"`
 	BaseFrontendUrl string `envconfig:"BASE_FRONTEND_URL" required:"true" default:"http://localhost:3000"`
 
+	SessionTTL int64  `envconfig:"SESSION_DAYS" default:"24"`
+	JwtSecret  string `envconfig:"JWT_SECRET" default:"asdasklhfkdjfksh23423432hjgjhg"`
+
 	Dns          string `envconfig:"DATABASE" required:"true"`
 	MaxIdleConns int    `envconfig:"DATABASE_MAX_IDLE_CONNS" required:"15"`
 	MaxOpenConns int    `envconfig:"DATABASE_OPEN_IDLE_CONNS" required:"10"`
