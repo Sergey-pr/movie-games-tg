@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"errors"
 	"github.com/Sergey-pr/movie-games-tg/persist"
 	"github.com/Sergey-pr/movie-games-tg/utils"
 	"github.com/doug-martin/goqu/v9"
@@ -27,6 +28,31 @@ type Card struct {
 	PixelatedUrl  string      `db:"pixelated_url"`
 	ScreenshotUrl string      `db:"screenshot_url"`
 	BackgroundUrl string      `db:"bg_url"`
+}
+
+// GetCardById return card object by expression
+func GetCardById(ctx context.Context, cardId int) (*Card, error) {
+	var obj Card
+	exists, err := persist.Db.From(CardsTableName).Where(
+		goqu.Ex{"id": cardId},
+	).ScanStructContext(ctx, &obj)
+	if err != nil {
+		return nil, err
+	}
+	if exists == false {
+		return nil, errors.New("card not found")
+	}
+	return &obj, nil
+}
+
+// GetAllCards return all existing cards
+func GetAllCards(ctx context.Context) ([]*Card, error) {
+	var objs []*Card
+	err := persist.Db.From(CardsTableName).ScanStructsContext(ctx, &objs)
+	if err != nil {
+		return nil, err
+	}
+	return objs, nil
 }
 
 func (obj *Card) GetId() int {

@@ -4,6 +4,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
+	"strconv"
 )
 
 func JsonScan[T any](src interface{}, b T) error {
@@ -41,4 +42,12 @@ func (b *JSONB) AsFloatSlice() []float64 {
 	}
 
 	return arr
+}
+
+func ParseInt(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		panic(err)
+	}
+	return i
 }

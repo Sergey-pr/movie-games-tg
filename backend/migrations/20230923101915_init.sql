@@ -4,9 +4,9 @@ CREATE EXTENSION IF NOT EXISTS citext;
 CREATE TABLE users
 (
     id              serial          PRIMARY KEY,
-    tg_id           int             NOT NULL,
-    name            varchar(250)    NOT NULL,
-    language        varchar(50)     NOT NULL,
+    telegram_id     int         ,
+    name            citext,
+    language        varchar(50) ,
     answered_cards  jsonb
 );
 
@@ -15,19 +15,19 @@ CREATE TABLE cards
 (
     id              serial          PRIMARY KEY,
     category        card_category   NOT NULL,
-    name_ru         varchar(250)    NOT NULL,
-    name_en         varchar(250)    NOT NULL,
-    desc_ru         varchar(250)    NOT NULL,
-    desc_en         varchar(250)    NOT NULL,
-    quote_ru        varchar(250)    NOT NULL,
-    quote_en        varchar(250)    NOT NULL,
-    facts_ru        jsonb           NOT NULL,
-    facts_en        jsonb           NOT NULL,
-    answers         jsonb           NOT NULL,
-    drawing_url     varchar(250)    NOT NULL,
-    pixelated_url   varchar(250)    NOT NULL,
-    screenshot_url  varchar(250)    NOT NULL,
-    bg_url          varchar(250)    NOT NULL
+    name_ru         citext,
+    name_en         citext,
+    desc_ru         varchar(250),
+    desc_en         varchar(250),
+    quote_ru        varchar(250),
+    quote_en        varchar(250),
+    facts_ru        jsonb,
+    facts_en        jsonb,
+    answers         jsonb,
+    drawing_url     varchar(250),
+    pixelated_url   varchar(250),
+    screenshot_url  varchar(250),
+    bg_url          varchar(250)
 );
 
 

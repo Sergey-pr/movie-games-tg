@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/Sergey-pr/movie-games-tg/models"
 	"github.com/Sergey-pr/movie-games-tg/utils"
+	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -45,4 +47,20 @@ func Resp(w http.ResponseWriter, i interface{}, statusCode ...int) {
 	if i != nil {
 		_ = json.NewEncoder(w).Encode(i)
 	}
+}
+
+func GetUser(r *http.Request) *models.User {
+	return r.Context().Value(models.UserContextKey).(*models.User)
+}
+
+func GetMuxParam(r *http.Request, key string) string {
+	return mux.Vars(r)[key]
+}
+
+func GetId(r *http.Request) int {
+	return utils.ParseInt(GetMuxParam(r, "id"))
+}
+
+func Ok(w http.ResponseWriter) {
+	Resp(w, map[string]string{"status": "Ok"})
 }

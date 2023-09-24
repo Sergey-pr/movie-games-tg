@@ -2,6 +2,7 @@ package muxserver
 
 import (
 	"context"
+	"errors"
 	"github.com/Sergey-pr/movie-games-tg/models"
 	"github.com/Sergey-pr/movie-games-tg/utils/jwt"
 	"github.com/gorilla/mux"
@@ -36,6 +37,10 @@ func authMiddleware(next http.Handler) http.Handler {
 			if err != nil {
 				panic(err)
 			}
+		}
+
+		if user == nil {
+			panic(errors.New("not authorized"))
 		}
 
 		ctx = context.WithValue(ctx, models.UserContextKey, user)

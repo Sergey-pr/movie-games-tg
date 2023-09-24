@@ -17,8 +17,9 @@ const (
 
 type User struct {
 	Id            int         `db:"id" goqu:"skipupdate,skipinsert"`
-	TelegramId    int         `db:"tg_id"`
+	TelegramId    int         `db:"telegram_id"`
 	Name          string      `db:"name"`
+	Language      string      `db:"language"`
 	AnsweredCards utils.JSONB `db:"answered_cards"`
 }
 
@@ -36,7 +37,7 @@ func LoginUser(ctx context.Context, telegramId int) (*User, error) {
 func GetUserByTelegramId(ctx context.Context, telegramId int) (*User, error) {
 	var obj User
 	exists, err := persist.Db.From(UsersTableName).Where(
-		goqu.Ex{"tg_id": telegramId},
+		goqu.Ex{"telegram_id": telegramId},
 	).ScanStructContext(ctx, &obj)
 	if err != nil {
 		return nil, err

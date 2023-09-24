@@ -21,7 +21,13 @@ func NewValidator() *validator.Validate {
 
 type ValidateErrors []ValidateError
 
-func (ValidateErrors) Error() string { return "validation errors" }
+func (e ValidateErrors) Error() string {
+	errStrings := make([]string, len(e))
+	for i, err := range e {
+		errStrings[i] = err.Error()
+	}
+	return strings.Join(errStrings, ", ")
+}
 
 type ValidateError struct {
 	Field string `json:"field"`

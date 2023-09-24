@@ -5,13 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/ssoroka/slice"
+	"github.com/Sergey-pr/movie-games-tg/config"
+	"github.com/Sergey-pr/movie-games-tg/utils"
 	"io"
 	"log"
-	"mediacore/core"
-	"mediacore/models/dam"
-	"mediacore/pkg/config"
-	"mediacore/pkg/persist"
 	"net/http"
 	"runtime/debug"
 
@@ -26,7 +23,6 @@ func panicMiddleware(h http.Handler) http.Handler {
 			panic(err)
 		}
 		defer func() {
-			ctx := req.Context()
 			r := recover()
 			if r != nil {
 
@@ -37,44 +33,26 @@ func panicMiddleware(h http.Handler) http.Handler {
 
 				switch t := r.(type) {
 				case *pq.Error:
-					captureSentryErr(req, payload, t)
 					pqError := t
 					switch pqError.Code {
 					case "23505":
-						errDetails = dam.UniqueValueError(ctx)
+						errDetails = errors.New("value not unique")
 						errHttpCode = http.StatusConflict
 					case "P0001":
-						errDetails = dam.AccountLimitError(ctx)
+						errDetails = errors.New("account limit")
 						errHttpCode = http.StatusPaymentRequired
 					default:
 						errDetails = fmt.Sprintf("%s : %s", pqError.Code, pqError.Message)
 						errHttpCode = http.StatusBadRequest
 					}
-				case *core.DamError:
-					if !slice.Contains(persist.SentryIgnoreStatusCodes, t.StatusCode) {
-						captureSentryErr(req, payload, t)
-					}
-					l := t.DamError()
-					errDetails = l.(core.DamError).Details
-					errHttpCode = l.(core.DamError).StatusCode
-					if errHttpCode == 0 {
-						errHttpCode = http.StatusInternalServerError
-					}
-					if errHttpCode > http.StatusInternalServerError {
-						log.Println(string(debug.Stack()))
-						log.Println(t.Error())
-					}
+				case utils.ValidateError:
+					errHttpCode = http.StatusBadRequest
+					errDetails = utils.ValidateErrors{t}.Error()
+				case utils.ValidateErrors:
+					errHttpCode = http.StatusBadRequest
+					errDetails = t.Error()
 				case string:
-					captureSentryErr(req, payload, errors.New(t))
 					errDetails = t
-				case core.ValidateError:
-					captureSentryErr(req, payload, t)
-					errHttpCode = http.StatusBadRequest
-					errDetails = core.ValidateErrors{t}.DamError()
-				case core.ValidateErrors:
-					captureSentryErr(req, payload, t)
-					errHttpCode = http.StatusBadRequest
-					errDetails = t.DamError()
 				case error:
 					if config.AppConfig.Debug == true {
 						log.Println(string(debug.Stack()))
