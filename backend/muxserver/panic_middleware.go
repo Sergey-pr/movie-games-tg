@@ -54,11 +54,6 @@ func panicMiddleware(h http.Handler) http.Handler {
 				case string:
 					errDetails = t
 				case error:
-					if config.AppConfig.Debug == true {
-						log.Println(string(debug.Stack()))
-						log.Println(t.Error())
-					}
-
 					errDetails = t.Error()
 
 				default:

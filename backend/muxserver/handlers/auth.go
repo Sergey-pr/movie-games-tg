@@ -11,15 +11,15 @@ import (
 func Login(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	var form forms.UserForm
+	var form forms.LoginForm
 	OrPanic(ValidateForm(r, &form))
 
-	user, err := models.LoginUser(ctx, form.TelegramId)
+	user, err := models.LoginUser(ctx, form.User.TelegramId)
 	if err != nil {
 		user = &models.User{
-			TelegramId: form.TelegramId,
-			Name:       form.Name,
-			Language:   form.Language,
+			TelegramId: form.User.TelegramId,
+			Name:       form.User.Name,
+			Language:   form.User.Language,
 		}
 		OrPanic(user.Save(ctx))
 	}
