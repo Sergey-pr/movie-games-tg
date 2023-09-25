@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  frontend:
+    build: frontend
+#    command: /root/main
+    environment:
+      - VUE_APP_BASE_URL=localhost:8888
+    ports:
+      - "80:80"
+
+  api:
+    build: backend
+#    command: /root/main
+    environment:
+      - DATABASE='user=sergei password=regedit257 host=localhost port=5432 dbname=movie_games sslmode=disable'
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    ports:
+      - "8888:8888"
+
+  migrator:
+    image: "ghcr.io/amacneil/dbmate:1"
+    environment:
+      - DBMATE_NO_DUMP_SCHEMA=true
+      - DBMATE_MIGRATIONS_DIR=migrations
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/movie_games?sslmode=disable
+    volumes:
+      - ./backend/migrations:/migrations
+    command:
+      - up
+    depends_on:
+      db:
+        condition: service_healthy
+    links:
+      - db
+  db:
+    image: postgres
+    ports:
+      - "5430:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=movie_games
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
