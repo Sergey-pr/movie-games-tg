@@ -23,7 +23,8 @@ type Card struct {
 	QuoteEn       string      `db:"quote_en"`
 	FactsRu       utils.JSONB `db:"facts_ru"`
 	FactsEn       utils.JSONB `db:"facts_en"`
-	Answers       utils.JSONB `db:"answers"`
+	AnswersEn     utils.JSONB `db:"answers_en"`
+	AnswersRu     utils.JSONB `db:"answers_ru"`
 	DrawingUrl    string      `db:"drawing_url"`
 	PixelatedUrl  string      `db:"pixelated_url"`
 	ScreenshotUrl string      `db:"screenshot_url"`
@@ -53,10 +54,6 @@ func GetAllCards(ctx context.Context) ([]*Card, error) {
 		return nil, err
 	}
 	return objs, nil
-}
-
-func (obj *Card) GetId() int {
-	return obj.Id
 }
 
 // Save card instance in DB

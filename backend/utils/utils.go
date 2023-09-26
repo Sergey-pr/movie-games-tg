@@ -51,3 +51,11 @@ func ParseInt(s string) int {
 	}
 	return i
 }
+
+func ToGenericArray[T any](arr []T) []interface{} {
+	res := make([]interface{}, len(arr))
+	for idx, v := range arr {
+		res[idx] = v
+	}
+	return res
+}

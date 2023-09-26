@@ -8,5 +8,6 @@ type LoginForm struct {
 type UserForm struct {
 	TelegramId int    `json:"id" validate:"required"`
 	Name       string `json:"first_name" validate:"required"`
+	UserName   string `json:"username"`
 	Language   string `json:"language_code" validate:"required"`
 }

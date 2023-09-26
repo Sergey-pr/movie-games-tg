@@ -19,6 +19,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		user = &models.User{
 			TelegramId: form.User.TelegramId,
 			Name:       form.User.Name,
+			UserName:   form.User.UserName,
 			Language:   form.User.Language,
 		}
 		OrPanic(user.Save(ctx))

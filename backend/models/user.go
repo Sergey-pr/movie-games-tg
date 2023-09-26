@@ -19,8 +19,10 @@ type User struct {
 	Id            int         `db:"id" goqu:"skipupdate,skipinsert"`
 	TelegramId    int         `db:"telegram_id"`
 	Name          string      `db:"name"`
+	UserName      string      `db:"username"`
 	Language      string      `db:"language"`
 	AnsweredCards utils.JSONB `db:"answered_cards"`
+	IsAdmin       bool        `db:"is_admin"`
 }
 
 // LoginUser find user in DB and check password
@@ -63,6 +65,43 @@ func GetUserById(ctx context.Context, userId int) (*User, error) {
 	return &obj, nil
 }
 
+func (obj *User) GetBotProcessor(ctx context.Context, chatId int) (*CardProcessor, error) {
+	var processor *CardProcessor
+	exists, err := persist.Db.From(CardProcessorsTableName).Where(
+		goqu.Ex{"user_id": obj.Id},
+	).ScanStructContext(ctx, &processor)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		processor = &CardProcessor{
+			UserId: obj.Id,
+			User:   obj,
+			State:  0,
+		}
+		err = processor.Save(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+	processor.ChatId = chatId
+	processor.User = obj
+	if processor.CardId != nil {
+		var card *Card
+		exists, err = persist.Db.From(CardsTableName).Where(
+			goqu.Ex{"id": processor.CardId},
+		).ScanStructContext(ctx, &card)
+		if err != nil {
+			return nil, err
+		}
+		if !exists {
+			return nil, errors.New("card not found")
+		}
+		processor.Card = card
+	}
+	return processor, nil
+}
+
 func (obj *User) GetJwtToken() (string, time.Time, error) {
 	return jwt.GetJwtToken(&jwt.Claims{
 		User: jwt.UserClaims{
@@ -72,10 +111,6 @@ func (obj *User) GetJwtToken() (string, time.Time, error) {
 			AnsweredCards: obj.AnsweredCards,
 		},
 	})
-}
-
-func (obj *User) GetId() int {
-	return obj.Id
 }
 
 // Save user instance in DB
