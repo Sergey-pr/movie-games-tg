@@ -16,7 +16,8 @@ type card struct {
 	QuoteEn       string      `json:"quote_en"`
 	FactsRu       utils.JSONB `json:"facts_ru"`
 	FactsEn       utils.JSONB `json:"facts_en"`
-	Answers       utils.JSONB `json:"answers"`
+	AnswersRu     utils.JSONB `json:"answers_ru"`
+	AnswersEn     utils.JSONB `json:"answers_en"`
 	DrawingUrl    string      `json:"drawing_url"`
 	PixelatedUrl  string      `json:"pixelated_url"`
 	ScreenshotUrl string      `json:"screenshot_url"`
@@ -35,7 +36,8 @@ func Card(obj *models.Card) *card {
 		QuoteEn:       obj.QuoteEn,
 		FactsRu:       obj.FactsRu,
 		FactsEn:       obj.FactsEn,
-		Answers:       obj.Answers,
+		AnswersRu:     obj.AnswersRu,
+		AnswersEn:     obj.AnswersEn,
 		DrawingUrl:    obj.DrawingUrl,
 		PixelatedUrl:  obj.PixelatedUrl,
 		ScreenshotUrl: obj.ScreenshotUrl,

@@ -66,7 +66,7 @@ func GetUserById(ctx context.Context, userId int) (*User, error) {
 }
 
 func (obj *User) GetBotProcessor(ctx context.Context, chatId int) (*CardProcessor, error) {
-	var processor *CardProcessor
+	var processor CardProcessor
 	exists, err := persist.Db.From(CardProcessorsTableName).Where(
 		goqu.Ex{"user_id": obj.Id},
 	).ScanStructContext(ctx, &processor)
@@ -74,7 +74,7 @@ func (obj *User) GetBotProcessor(ctx context.Context, chatId int) (*CardProcesso
 		return nil, err
 	}
 	if !exists {
-		processor = &CardProcessor{
+		processor = CardProcessor{
 			UserId: obj.Id,
 			User:   obj,
 			State:  0,
@@ -87,7 +87,7 @@ func (obj *User) GetBotProcessor(ctx context.Context, chatId int) (*CardProcesso
 	processor.ChatId = chatId
 	processor.User = obj
 	if processor.CardId != nil {
-		var card *Card
+		var card Card
 		exists, err = persist.Db.From(CardsTableName).Where(
 			goqu.Ex{"id": processor.CardId},
 		).ScanStructContext(ctx, &card)
@@ -97,9 +97,9 @@ func (obj *User) GetBotProcessor(ctx context.Context, chatId int) (*CardProcesso
 		if !exists {
 			return nil, errors.New("card not found")
 		}
-		processor.Card = card
+		processor.Card = &card
 	}
-	return processor, nil
+	return &processor, nil
 }
 
 func (obj *User) GetJwtToken() (string, time.Time, error) {

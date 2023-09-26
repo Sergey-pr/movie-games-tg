@@ -27,6 +27,13 @@ type CardProcessor struct {
 }
 
 func (obj *CardProcessor) ProcessMsg(ctx context.Context, msg string) error {
+	if obj.State != 0 && msg != "/stop" {
+		err := obj.addCard(ctx, msg)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
 	switch msg {
 	case "/add":
 		err := obj.addCard(ctx, msg)
@@ -34,7 +41,7 @@ func (obj *CardProcessor) ProcessMsg(ctx context.Context, msg string) error {
 			return err
 		}
 	case "/stop":
-		err := obj.sendDefaultMessage()
+		err := obj.sendStopMessage()
 		if err != nil {
 			return err
 		}
@@ -362,16 +369,19 @@ func (obj *CardProcessor) processAddEnglishName(ctx context.Context, msg string)
 		return err
 	}
 
-	card := &Card{
-		Category: "movie",
-		NameEn:   msg,
-	}
-	obj.Card = card
-	err = obj.Card.Save(ctx)
-	if err != nil {
-		return err
+	if obj.Card == nil {
+		card := &Card{
+			Category: "movie",
+			NameEn:   msg,
+		}
+		obj.Card = card
+		err = obj.Card.Save(ctx)
+		if err != nil {
+			return err
+		}
 	}
 
+	obj.CardId = &obj.Card.Id
 	obj.State = 2
 	err = obj.Save(ctx)
 	if err != nil {
@@ -394,6 +404,20 @@ func (obj *CardProcessor) processAddCard(ctx context.Context) error {
 
 	obj.State = 1
 	err = obj.Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (obj *CardProcessor) sendStopMessage() error {
+	var answer string
+	if obj.User.Language == "ru" {
+		answer = "Создание карточки остановленно"
+	} else {
+		answer = "Creating of a new card is stopped"
+	}
+	err := utils.SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}

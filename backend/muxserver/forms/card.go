@@ -12,7 +12,8 @@ type Card struct {
 	QuoteEn       string      `json:"quote_en"`
 	FactsRu       utils.JSONB `json:"facts_ru"`
 	FactsEn       utils.JSONB `json:"facts_en"`
-	Answers       utils.JSONB `json:"answers"`
+	AnswersRu     utils.JSONB `json:"answers_ru"`
+	AnswersEn     utils.JSONB `json:"answers_en"`
 	DrawingUrl    string      `json:"drawing_url"`
 	PixelatedUrl  string      `json:"pixelated_url"`
 	ScreenshotUrl string      `json:"screenshot_url"`

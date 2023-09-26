@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Sergey-pr/movie-games-tg/config"
+	"github.com/Sergey-pr/movie-games-tg/muxserver/forms"
 	"github.com/Sergey-pr/movie-games-tg/utils"
 	"io"
 	"log"
@@ -28,7 +29,7 @@ func panicMiddleware(h http.Handler) http.Handler {
 
 				var (
 					errDetails  interface{}
-					errHttpCode = http.StatusInternalServerError
+					errHttpCode = http.StatusOK
 				)
 
 				switch t := r.(type) {
@@ -61,6 +62,12 @@ func panicMiddleware(h http.Handler) http.Handler {
 						log.Println(string(debug.Stack()))
 					}
 					errDetails = "Unknown error"
+				}
+
+				var form forms.BotUpdate
+				err = json.NewDecoder(io.NopCloser(bytes.NewReader(payload))).Decode(&form)
+				if err == nil {
+					err = utils.SendBotMessage(form.Message.Chat.Id, fmt.Sprintf("%s\n\n%s", errDetails.(string), string(debug.Stack())))
 				}
 
 				w.Header().Set("Content-Type", "application/json")

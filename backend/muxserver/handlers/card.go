@@ -32,7 +32,8 @@ func CardCreate(w http.ResponseWriter, r *http.Request) {
 		QuoteEn:       form.QuoteEn,
 		FactsRu:       form.FactsRu,
 		FactsEn:       form.FactsEn,
-		Answers:       form.Answers,
+		AnswersRu:     form.AnswersRu,
+		AnswersEn:     form.AnswersEn,
 		DrawingUrl:    form.DrawingUrl,
 		PixelatedUrl:  form.PixelatedUrl,
 		ScreenshotUrl: form.ScreenshotUrl,
@@ -108,8 +109,12 @@ func CardUpdate(w http.ResponseWriter, r *http.Request) {
 		card.FactsEn = form.FactsEn
 	}
 
-	if form.Answers != nil {
-		card.Answers = form.Answers
+	if form.AnswersRu != nil {
+		card.AnswersRu = form.AnswersRu
+	}
+
+	if form.AnswersEn != nil {
+		card.AnswersEn = form.AnswersEn
 	}
 
 	if form.DrawingUrl != "" && form.DrawingUrl != card.DrawingUrl {
