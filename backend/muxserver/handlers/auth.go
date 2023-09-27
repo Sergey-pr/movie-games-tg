@@ -14,6 +14,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	var form forms.LoginForm
 	OrPanic(ValidateForm(r, &form))
 
+	//TODO add secure check
 	user, err := models.LoginUser(ctx, form.User.TelegramId)
 	if err != nil {
 		user = &models.User{
