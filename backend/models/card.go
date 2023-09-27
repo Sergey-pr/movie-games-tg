@@ -13,22 +13,23 @@ const (
 )
 
 type Card struct {
-	Id            int         `db:"id" goqu:"skipupdate,skipinsert"`
-	Category      string      `db:"category"`
-	NameRu        string      `db:"name_ru"`
-	DescRu        string      `db:"desc_ru"`
-	QuoteRu       string      `db:"quote_ru"`
-	NameEn        string      `db:"name_en"`
-	DescEn        string      `db:"desc_en"`
-	QuoteEn       string      `db:"quote_en"`
-	FactsRu       utils.JSONB `db:"facts_ru"`
-	FactsEn       utils.JSONB `db:"facts_en"`
-	AnswersEn     utils.JSONB `db:"answers_en"`
-	AnswersRu     utils.JSONB `db:"answers_ru"`
-	DrawingUrl    string      `db:"drawing_url"`
-	PixelatedUrl  string      `db:"pixelated_url"`
-	ScreenshotUrl string      `db:"screenshot_url"`
-	BackgroundUrl string      `db:"bg_url"`
+	Id           int         `db:"id" goqu:"skipupdate,skipinsert"`
+	Category     string      `db:"category"`
+	NameRu       string      `db:"name_ru"`
+	DescRu       string      `db:"desc_ru"`
+	QuoteRu      string      `db:"quote_ru"`
+	NameEn       string      `db:"name_en"`
+	DescEn       string      `db:"desc_en"`
+	QuoteEn      string      `db:"quote_en"`
+	FactsRu      utils.JSONB `db:"facts_ru"`
+	FactsEn      utils.JSONB `db:"facts_en"`
+	AnswersEn    utils.JSONB `db:"answers_en"`
+	AnswersRu    utils.JSONB `db:"answers_ru"`
+	DrawingId    string      `db:"drawing_id"`
+	PixelatedId  string      `db:"pixelated_id"`
+	ScreenshotId string      `db:"screenshot_id"`
+	BackgroundId string      `db:"bg_id"`
+	Completed    bool        `db:"completed"`
 }
 
 // GetCardById return card object by expression

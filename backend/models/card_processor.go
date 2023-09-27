@@ -3,6 +3,7 @@ package models
 import (
 	"context"
 	"fmt"
+	"github.com/Sergey-pr/movie-games-tg/muxserver/forms"
 	"github.com/Sergey-pr/movie-games-tg/persist"
 	"github.com/Sergey-pr/movie-games-tg/utils"
 	"github.com/doug-martin/goqu/v9"
@@ -26,17 +27,17 @@ type CardProcessor struct {
 	ChatId int   `db:"-"`
 }
 
-func (obj *CardProcessor) ProcessMsg(ctx context.Context, msg string) error {
-	if obj.State != 0 && msg != "/stop" {
-		err := obj.addCard(ctx, msg)
+func (obj *CardProcessor) ProcessMsg(ctx context.Context, form *forms.BotUpdate) error {
+	if obj.State != 0 && form.Message.Text != "/stop" {
+		err := obj.addCard(ctx, form)
 		if err != nil {
 			return err
 		}
 		return nil
 	}
-	switch msg {
+	switch form.Message.Text {
 	case "/add":
-		err := obj.addCard(ctx, msg)
+		err := obj.addCard(ctx, form)
 		if err != nil {
 			return err
 		}
@@ -59,7 +60,7 @@ func (obj *CardProcessor) ProcessMsg(ctx context.Context, msg string) error {
 	return nil
 }
 
-func (obj *CardProcessor) addCard(ctx context.Context, msg string) error {
+func (obj *CardProcessor) addCard(ctx context.Context, form *forms.BotUpdate) error {
 	var err error
 	switch obj.State {
 	case 0:
@@ -68,42 +69,72 @@ func (obj *CardProcessor) addCard(ctx context.Context, msg string) error {
 			return err
 		}
 	case 1:
-		err = obj.processAddEnglishName(ctx, msg)
+		err = obj.processAddEnglishName(ctx, form.Message.Text)
 		if err != nil {
 			return err
 		}
 	case 2:
-		err = obj.processAddRussianName(ctx, msg)
+		err = obj.processAddRussianName(ctx, form.Message.Text)
 		if err != nil {
 			return err
 		}
 	case 3:
-		err = obj.processAddEnglishDesc(ctx, msg)
+		err = obj.processAddEnglishDesc(ctx, form.Message.Text)
 		if err != nil {
 			return err
 		}
 	case 4:
-		err = obj.processAddRussianDesc(ctx, msg)
+		err = obj.processAddRussianDesc(ctx, form.Message.Text)
 		if err != nil {
 			return err
 		}
 	case 5:
-		err = obj.processAddEnglishQuote(ctx, msg)
+		err = obj.processAddEnglishQuote(ctx, form.Message.Text)
 		if err != nil {
 			return err
 		}
 	case 6:
-		err = obj.processAddRussianQuote(ctx, msg)
+		err = obj.processAddRussianQuote(ctx, form.Message.Text)
 		if err != nil {
 			return err
 		}
 	case 7:
-		err = obj.processAddEnglishAnswers(ctx, msg)
+		err = obj.processAddEnglishAnswers(ctx, form.Message.Text)
 		if err != nil {
 			return err
 		}
 	case 8:
-		err = obj.processAddRussianAnswers(ctx, msg)
+		err = obj.processAddRussianAnswers(ctx, form.Message.Text)
+		if err != nil {
+			return err
+		}
+	case 9:
+		err = obj.processAddEnglishFacts(ctx, form.Message.Text)
+		if err != nil {
+			return err
+		}
+	case 10:
+		err = obj.processAddRussianFacts(ctx, form.Message.Text)
+		if err != nil {
+			return err
+		}
+	case 11:
+		err = obj.processAddDrawing(ctx, form)
+		if err != nil {
+			return err
+		}
+	case 12:
+		err = obj.processAddPixelated(ctx, form)
+		if err != nil {
+			return err
+		}
+	case 13:
+		err = obj.processAddScreenshot(ctx, form)
+		if err != nil {
+			return err
+		}
+	case 14:
+		err = obj.processAddBackground(ctx, form)
 		if err != nil {
 			return err
 		}
@@ -116,13 +147,275 @@ func (obj *CardProcessor) addCard(ctx context.Context, msg string) error {
 	return nil
 }
 
+func (obj *CardProcessor) processAddBackground(ctx context.Context, form *forms.BotUpdate) error {
+	var imageId string
+	if form.Message.Document.FileId != "" {
+		imageId = form.Message.Document.FileId
+	} else if len(form.Message.Photo) > 0 {
+		imageId = form.Message.Photo[0].FileId
+	} else {
+		var answer string
+		if obj.User.Language == "ru" {
+			answer = "Приложите изображение к сообщению, желательно как файл."
+		} else {
+			answer = "Please attach image to the message as a file."
+		}
+		err := utils.SendBotMessage(obj.ChatId, answer)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	var answer string
+	if obj.User.Language == "ru" {
+		answer = "Изображение сохранено.\n\nКарточка готова!."
+	} else {
+		answer = "Image saved.\n\nThe card is ready!"
+	}
+	err := utils.SendBotMessage(obj.ChatId, answer)
+	if err != nil {
+		return err
+	}
+
+	obj.Card.BackgroundId = imageId
+	obj.Card.Completed = true
+	err = obj.Card.Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = utils.DownloadBotImage(imageId)
+	if err != nil {
+		return err
+	}
+
+	obj.State = 0
+	obj.Card = nil
+	obj.CardId = nil
+	err = obj.Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (obj *CardProcessor) processAddScreenshot(ctx context.Context, form *forms.BotUpdate) error {
+	var imageId string
+	if form.Message.Document.FileId != "" {
+		imageId = form.Message.Document.FileId
+	} else if len(form.Message.Photo) > 0 {
+		imageId = form.Message.Photo[0].FileId
+	} else {
+		var answer string
+		if obj.User.Language == "ru" {
+			answer = "Приложите изображение к сообщению, желательно как файл."
+		} else {
+			answer = "Please attach image to the message as a file."
+		}
+		err := utils.SendBotMessage(obj.ChatId, answer)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	var answer string
+	if obj.User.Language == "ru" {
+		answer = "Изображение сохранено.\n\nТеперь добавьте изображение фона для карточки."
+	} else {
+		answer = "Image saved.\n\nNow let's add a background for card."
+	}
+	err := utils.SendBotMessage(obj.ChatId, answer)
+	if err != nil {
+		return err
+	}
+
+	obj.Card.ScreenshotId = imageId
+	err = obj.Card.Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = utils.DownloadBotImage(imageId)
+	if err != nil {
+		return err
+	}
+
+	obj.State = 14
+	err = obj.Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (obj *CardProcessor) processAddPixelated(ctx context.Context, form *forms.BotUpdate) error {
+	var imageId string
+	if form.Message.Document.FileId != "" {
+		imageId = form.Message.Document.FileId
+	} else if len(form.Message.Photo) > 0 {
+		imageId = form.Message.Photo[0].FileId
+	} else {
+		var answer string
+		if obj.User.Language == "ru" {
+			answer = "Приложите изображение к сообщению, желательно как файл."
+		} else {
+			answer = "Please attach image to the message as a file."
+		}
+		err := utils.SendBotMessage(obj.ChatId, answer)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	var answer string
+	if obj.User.Language == "ru" {
+		answer = "Изображение сохранено.\n\nТеперь добавьте кадр из фильма."
+	} else {
+		answer = "Image saved.\n\nNow let's add a screenshot from movie."
+	}
+	err := utils.SendBotMessage(obj.ChatId, answer)
+	if err != nil {
+		return err
+	}
+
+	obj.Card.PixelatedId = imageId
+	err = obj.Card.Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = utils.DownloadBotImage(imageId)
+	if err != nil {
+		return err
+	}
+
+	obj.State = 13
+	err = obj.Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (obj *CardProcessor) processAddDrawing(ctx context.Context, form *forms.BotUpdate) error {
+	var imageId string
+	if form.Message.Document.FileId != "" {
+		imageId = form.Message.Document.FileId
+	} else if len(form.Message.Photo) > 0 {
+		imageId = form.Message.Photo[0].FileId
+	} else {
+		var answer string
+		if obj.User.Language == "ru" {
+			answer = "Приложите изображение к сообщению, желательно как файл."
+		} else {
+			answer = "Please attach image to the message as a file."
+		}
+		err := utils.SendBotMessage(obj.ChatId, answer)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	var answer string
+	if obj.User.Language == "ru" {
+		answer = "Изображение сохранено.\n\nТеперь добавьте пикселизированное изображение."
+	} else {
+		answer = "Image saved.\n\nNow let's add a pixelated image."
+	}
+	err := utils.SendBotMessage(obj.ChatId, answer)
+	if err != nil {
+		return err
+	}
+
+	obj.Card.DrawingId = imageId
+	err = obj.Card.Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	err = utils.DownloadBotImage(imageId)
+	if err != nil {
+		return err
+	}
+
+	obj.State = 12
+	err = obj.Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (obj *CardProcessor) processAddRussianFacts(ctx context.Context, msg string) error {
+	var answer string
+	if slice.Contains(NegativeAnswersSlice, msg) {
+		if obj.User.Language == "ru" {
+			answer = "Теперь добавим рисунок с прозрачным фоном. Приложите его к сообщению, желательно как файл."
+		} else {
+			answer = "Now let's add drawing with transparent background. Please attach it to the message as a file."
+		}
+	} else {
+		facts := strings.Split(msg, ";")
+		if obj.User.Language == "ru" {
+			answer = fmt.Sprintf("Русские факты:\n%s\n\nТеперь добавим изображение рисунка. Оно должно быть с прозрачным фоном.", strings.Join(facts, "\n"))
+		} else {
+			answer = fmt.Sprintf("Russian facts are:\n%s\n\nNow let's add a drawing image. It should be with a transparent background.", strings.Join(facts, "\n"))
+		}
+		obj.Card.FactsRu = utils.ToGenericArray(facts)
+		err := obj.Card.Save(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	err := utils.SendBotMessage(obj.ChatId, answer)
+	if err != nil {
+		return err
+	}
+
+	obj.State = 11
+	err = obj.Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (obj *CardProcessor) processAddEnglishFacts(ctx context.Context, msg string) error {
+	facts := strings.Split(msg, ";")
+
+	var answer string
+	if obj.User.Language == "ru" {
+		answer = fmt.Sprintf("Факты:\n%s\n\nДобавим факты на русском?\n\nНапишите \"Нет\" если не нужно, или напишите факты на русском.", strings.Join(facts, "\n"))
+	} else {
+		answer = fmt.Sprintf("Intereting facts:\n%s\n\nDo you want to add facts in russian?\n\nAnswer \"No\" if you don't need russian answers or type russian facts.", strings.Join(facts, "\n"))
+	}
+	err := utils.SendBotMessage(obj.ChatId, answer)
+	if err != nil {
+		return err
+	}
+
+	obj.Card.FactsEn = utils.ToGenericArray(facts)
+	err = obj.Card.Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	obj.State = 10
+	err = obj.Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (obj *CardProcessor) processAddRussianAnswers(ctx context.Context, msg string) error {
 	var answer string
 	if slice.Contains(NegativeAnswersSlice, msg) {
 		if obj.User.Language == "ru" {
-			answer = "Теперь добавим изображение рисунка. Оно должно быть с прозрачным фоном."
+			answer = "Теперь добавим факты о фильме. Их нужно перечислить через запятую."
 		} else {
-			answer = "Now let's add a drawing image. It should be with a transparent background."
+			answer = "Now let's add interesting facts about the movie. Type them with \";\" as delimiter."
 		}
 	} else {
 		answers := strings.Split(msg, ",")
@@ -139,9 +432,9 @@ func (obj *CardProcessor) processAddRussianAnswers(ctx context.Context, msg stri
 			}
 		}
 		if obj.User.Language == "ru" {
-			answer = fmt.Sprintf("Русские варианты ответов: %s\n\nТеперь добавим изображение рисунка. Оно должно быть с прозрачным фоном.", strings.Join(answers, "\n"))
+			answer = fmt.Sprintf("Русские варианты ответов:\n%s\n\nТеперь добавим изображение рисунка. Оно должно быть с прозрачным фоном.", strings.Join(answers, "\n"))
 		} else {
-			answer = fmt.Sprintf("Russian answers are: %s\n\nNow let's add a drawing image. It should be with a transparent background.", strings.Join(answers, "\n"))
+			answer = fmt.Sprintf("Russian answers are:\n%s\n\nNow let's add a drawing image. It should be with a transparent background.", strings.Join(answers, "\n"))
 		}
 		obj.Card.AnswersRu = utils.ToGenericArray(answers)
 		err := obj.Card.Save(ctx)
@@ -180,9 +473,9 @@ func (obj *CardProcessor) processAddEnglishAnswers(ctx context.Context, msg stri
 
 	var answer string
 	if obj.User.Language == "ru" {
-		answer = fmt.Sprintf("Варианты ответов: %s\n\nДобавим ответы на русском?\n\nНапишите \"Нет\" если не нужно, или напишите ответы на русском.", strings.Join(answers, "\n"))
+		answer = fmt.Sprintf("Варианты ответов:\n%s\n\nДобавим ответы на русском?\n\nНапишите \"Нет\" если не нужно, или напишите ответы на русском.", strings.Join(answers, "\n"))
 	} else {
-		answer = fmt.Sprintf("Answer variants: %s\n\nDo you want to add answers in russian?\n\nAnswer \"No\" if you don't need russian answers or type russian answers.", strings.Join(answers, "\n"))
+		answer = fmt.Sprintf("Answer variants:\n%s\n\nDo you want to add answers in russian?\n\nAnswer \"No\" if you don't need russian answers or type russian answers.", strings.Join(answers, "\n"))
 	}
 	err := utils.SendBotMessage(obj.ChatId, answer)
 	if err != nil {

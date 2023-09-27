@@ -17,6 +17,8 @@ services:
     depends_on:
       migrator:
         condition: service_completed_successfully
+    volumes:
+      - ./card_files:/card_files
     ports:
       - "8888:8888"
 

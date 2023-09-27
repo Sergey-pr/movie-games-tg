@@ -23,21 +23,21 @@ func CardCreate(w http.ResponseWriter, r *http.Request) {
 	OrPanic(ValidateForm(r, &form))
 
 	card := &models.Card{
-		Category:      form.Category,
-		NameRu:        form.NameRu,
-		DescRu:        form.DescRu,
-		QuoteRu:       form.QuoteRu,
-		NameEn:        form.NameEn,
-		DescEn:        form.DescEn,
-		QuoteEn:       form.QuoteEn,
-		FactsRu:       form.FactsRu,
-		FactsEn:       form.FactsEn,
-		AnswersRu:     form.AnswersRu,
-		AnswersEn:     form.AnswersEn,
-		DrawingUrl:    form.DrawingUrl,
-		PixelatedUrl:  form.PixelatedUrl,
-		ScreenshotUrl: form.ScreenshotUrl,
-		BackgroundUrl: form.BackgroundUrl,
+		Category:     form.Category,
+		NameRu:       form.NameRu,
+		DescRu:       form.DescRu,
+		QuoteRu:      form.QuoteRu,
+		NameEn:       form.NameEn,
+		DescEn:       form.DescEn,
+		QuoteEn:      form.QuoteEn,
+		FactsRu:      form.FactsRu,
+		FactsEn:      form.FactsEn,
+		AnswersRu:    form.AnswersRu,
+		AnswersEn:    form.AnswersEn,
+		DrawingId:    form.DrawingId,
+		PixelatedId:  form.PixelatedId,
+		ScreenshotId: form.ScreenshotId,
+		BackgroundId: form.BackgroundId,
 	}
 	OrPanic(card.Save(ctx))
 
@@ -117,20 +117,20 @@ func CardUpdate(w http.ResponseWriter, r *http.Request) {
 		card.AnswersEn = form.AnswersEn
 	}
 
-	if form.DrawingUrl != "" && form.DrawingUrl != card.DrawingUrl {
-		card.DrawingUrl = form.DrawingUrl
+	if form.DrawingId != "" && form.DrawingId != card.DrawingId {
+		card.DrawingId = form.DrawingId
 	}
 
-	if form.PixelatedUrl != "" && form.PixelatedUrl != card.PixelatedUrl {
-		card.PixelatedUrl = form.PixelatedUrl
+	if form.PixelatedId != "" && form.PixelatedId != card.PixelatedId {
+		card.PixelatedId = form.PixelatedId
 	}
 
-	if form.ScreenshotUrl != "" && form.ScreenshotUrl != card.ScreenshotUrl {
-		card.ScreenshotUrl = form.ScreenshotUrl
+	if form.ScreenshotId != "" && form.ScreenshotId != card.ScreenshotId {
+		card.ScreenshotId = form.ScreenshotId
 	}
 
-	if form.BackgroundUrl != "" && form.BackgroundUrl != card.BackgroundUrl {
-		card.BackgroundUrl = form.BackgroundUrl
+	if form.BackgroundId != "" && form.BackgroundId != card.BackgroundId {
+		card.BackgroundId = form.BackgroundId
 	}
 
 	OrPanic(card.Save(ctx))

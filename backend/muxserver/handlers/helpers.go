@@ -61,6 +61,10 @@ func GetId(r *http.Request) int {
 	return utils.ParseInt(GetMuxParam(r, "id"))
 }
 
+func GetImageId(r *http.Request) string {
+	return GetMuxParam(r, "image_id")
+}
+
 func Ok(w http.ResponseWriter) {
 	Resp(w, map[string]string{"status": "Ok"})
 }
