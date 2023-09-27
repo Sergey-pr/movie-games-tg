@@ -3,6 +3,8 @@ import { axiosInstance } from './api';
 const urls = {
     login: 'api/public/login/',
     cards: 'api/cards/',
+    userInfo: 'api/user/',
+    userChangeLang: 'api/user/lang/'
 }
 
 export function createDynamicString(string, replaceParams) {
@@ -29,6 +31,27 @@ export function useCards() {
     return {
         cardsList() {
             return axiosInstance().get(urls.cards);
+        }
+    }
+}
+
+export function useUsers() {
+    return {
+        user(jwt) {
+            let config = {
+                headers: {
+                    jwt: jwt
+                }
+            }
+            return axiosInstance().get(urls.userInfo, config);
+        },
+        changeLang(jwt, lang) {
+            let config = {
+                headers: {
+                    jwt: jwt
+                }
+            }
+            return axiosInstance().post(urls.userChangeLang, {"language_code": lang}, config);
         }
     }
 }

@@ -35,6 +35,9 @@ func NewApiServer() *ApiServer {
 	private := router.PathPrefix("").Subrouter()
 	private.Use(authMiddleware)
 
+	private.HandleFunc("/user/", handlers.UserInfo).Methods(http.MethodGet).Name("")
+	private.HandleFunc("/user/lang/", handlers.UserChangeLang).Methods(http.MethodPost).Name("")
+
 	private.HandleFunc("/cards/", handlers.CardsList).Methods(http.MethodGet).Name("")
 	private.HandleFunc("/cards/", handlers.CardCreate).Methods(http.MethodPost).Name("")
 	private.HandleFunc("/cards/{id}/", handlers.CardDelete).Methods(http.MethodDelete).Name("")

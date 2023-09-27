@@ -11,3 +11,7 @@ type UserForm struct {
 	UserName   string `json:"username"`
 	Language   string `json:"language_code" validate:"required"`
 }
+
+type UserLang struct {
+	Language string `json:"language_code" validate:"required"`
+}
