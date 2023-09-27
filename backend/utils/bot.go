@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 type BotMessage struct {
@@ -54,8 +55,13 @@ func DownloadBotImage(imageId string) error {
 		return err
 	}
 
+	newPath := filepath.Join(".", "card_files")
+	err = os.MkdirAll(newPath, os.ModePerm)
+	if err != nil {
+		return err
+	}
 	// Create the file
-	out, err := os.Create(fmt.Sprintf("card_files/%s", imageId))
+	out, err := os.Create(filepath.Join("card_files", imageId))
 	if err != nil {
 		return err
 	}
