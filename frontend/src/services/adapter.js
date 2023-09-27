@@ -29,8 +29,13 @@ export function useAuth() {
 
 export function useCards() {
     return {
-        cardsList() {
-            return axiosInstance().get(urls.cards);
+        cardsList(jwt) {
+            let config = {
+                headers: {
+                    jwt: jwt
+                }
+            }
+            return axiosInstance().get(urls.cards, config);
         }
     }
 }

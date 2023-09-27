@@ -50,7 +50,7 @@ func GetCardById(ctx context.Context, cardId int) (*Card, error) {
 // GetAllCards return all existing cards
 func GetAllCards(ctx context.Context) ([]*Card, error) {
 	var objs []*Card
-	err := persist.Db.From(CardsTableName).ScanStructsContext(ctx, &objs)
+	err := persist.Db.From(CardsTableName).Where(goqu.C("completed").IsTrue()).ScanStructsContext(ctx, &objs)
 	if err != nil {
 		return nil, err
 	}
