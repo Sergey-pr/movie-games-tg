@@ -134,7 +134,12 @@ func (obj *CardProcessor) addCard(ctx context.Context, form *forms.BotUpdate) er
 			return err
 		}
 	case 14:
-		err = obj.processAddBackground(ctx, form)
+		err = obj.processAddBackgroundColor1(ctx, form.Message.Text)
+		if err != nil {
+			return err
+		}
+	case 15:
+		err = obj.processAddBackgroundColor2(ctx, form.Message.Text)
 		if err != nil {
 			return err
 		}
@@ -147,44 +152,20 @@ func (obj *CardProcessor) addCard(ctx context.Context, form *forms.BotUpdate) er
 	return nil
 }
 
-func (obj *CardProcessor) processAddBackground(ctx context.Context, form *forms.BotUpdate) error {
-	var imageId string
-	if form.Message.Document.FileId != "" {
-		imageId = form.Message.Document.FileId
-	} else if len(form.Message.Photo) > 0 {
-		imageId = form.Message.Photo[0].FileId
-	} else {
-		var answer string
-		if obj.User.Language == "ru" {
-			answer = "Приложите изображение к сообщению, желательно как файл."
-		} else {
-			answer = "Please attach image to the message as a file."
-		}
-		err := utils.SendBotMessage(obj.ChatId, answer)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
+func (obj *CardProcessor) processAddBackgroundColor2(ctx context.Context, msg string) error {
 	var answer string
 	if obj.User.Language == "ru" {
-		answer = "Изображение сохранено.\n\nКарточка готова!."
+		answer = fmt.Sprintf("Цвет: %s\n\nКарточка готова!", msg)
 	} else {
-		answer = "Image saved.\n\nThe card is ready!"
+		answer = fmt.Sprintf("Color: %s\n\nThe card is ready!", msg)
 	}
 	err := utils.SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
 
-	obj.Card.BackgroundId = imageId
-	obj.Card.Completed = true
+	obj.Card.BackgroundColor2 = msg
 	err = obj.Card.Save(ctx)
-	if err != nil {
-		return err
-	}
-
-	err = utils.DownloadBotImage(imageId)
 	if err != nil {
 		return err
 	}
@@ -192,6 +173,32 @@ func (obj *CardProcessor) processAddBackground(ctx context.Context, form *forms.
 	obj.State = 0
 	obj.Card = nil
 	obj.CardId = nil
+	err = obj.Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (obj *CardProcessor) processAddBackgroundColor1(ctx context.Context, msg string) error {
+	var answer string
+	if obj.User.Language == "ru" {
+		answer = fmt.Sprintf("Цвет: %s\n\nТеперь введите второй цвет градиента.", msg)
+	} else {
+		answer = fmt.Sprintf("Color: %s\n\nNow type the second background color.", msg)
+	}
+	err := utils.SendBotMessage(obj.ChatId, answer)
+	if err != nil {
+		return err
+	}
+
+	obj.Card.BackgroundColor1 = msg
+	err = obj.Card.Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	obj.State = 15
 	err = obj.Save(ctx)
 	if err != nil {
 		return err
@@ -220,9 +227,9 @@ func (obj *CardProcessor) processAddScreenshot(ctx context.Context, form *forms.
 	}
 	var answer string
 	if obj.User.Language == "ru" {
-		answer = "Изображение сохранено.\n\nТеперь добавьте изображение фона для карточки."
+		answer = "Изображение сохранено.\n\nТеперь напишите первый цвет для градиента фона. (#FF00FF)"
 	} else {
-		answer = "Image saved.\n\nNow let's add a background for card."
+		answer = "Image saved.\n\nNow let's add a first color for background gradient. (#FF00FF)"
 	}
 	err := utils.SendBotMessage(obj.ChatId, answer)
 	if err != nil {

@@ -1,13 +1,14 @@
 <template>
-  <div class="lang-changer">
-    <p class="lang">RU🇷🇺</p>
-    <label class="switch">
-      <input type="checkbox" v-model="language" true-value="en" false-value="ru"  @change="changeLang()">
-      <span class="slider round"></span>
-    </label>
-    <p class="lang">EN🇬🇧</p>
-  </div>
-  <div class="main">
+  <LoadingComponent class="loading" v-if="!loaded"></LoadingComponent>
+  <div class="main" v-if="loaded">
+    <div class="lang-changer">
+      <p class="lang">RU🇷🇺</p>
+      <label class="switch">
+        <input type="checkbox" v-model="language" true-value="en" false-value="ru"  @change="changeLang()">
+        <span class="slider round"></span>
+      </label>
+      <p class="lang">EN🇬🇧</p>
+    </div>
     <img class="logo" alt="Game logo" src="./../assets/logo.png">
     <h1 class="welcome-message">{{ welcomeMessage }}{{ userName }}</h1>
     <h3 class="description">{{ description }}</h3>
@@ -17,10 +18,12 @@
 
 <script>
 import {useAuth, useUsers} from "@/services/adapter";
+import LoadingComponent from "@/components/LoadingComponent.vue";
 
 export default {
   name: 'LandingPage',
   components: {
+    LoadingComponent,
   },
   data() {
     return {
@@ -80,6 +83,14 @@ export default {
 </script>
 
 <style>
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px;
+}
+
 .welcome-message {
   margin: 10px;
   color: var(--tg-theme-text-color);
@@ -95,8 +106,12 @@ body {
 }
 
 .main {
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  right: 10px;
+  left: 10px;
   border-radius: 25px;
-  margin: 2em;
   background-color: var(--tg-theme-secondary-bg-color);
 }
 
@@ -108,14 +123,13 @@ body {
 }
 
 .lang-changer {
+  margin: 5px;
   display: flex;
-  position: absolute;
-  top: 5px;
-  right: 5px;
+  float: right;
 }
 
 .logo {
-  margin: 10px;
+  margin: 30px 10px 30px 10px;
   max-width: 18em;
 }
 

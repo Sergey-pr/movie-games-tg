@@ -1,5 +1,9 @@
 {
   "dependencies": {
     "vue-router": "^4.0.13"
+  },
+  "devDependencies": {
+    "sass": "^1.68.0",
+    "sass-loader": "^13.3.2"
   }
 }

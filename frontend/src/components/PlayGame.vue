@@ -1,20 +1,22 @@
 <template>
-  <div>PlayGame</div>
-  <CardPage :card="currentCard"></CardPage>
+  <LoadingComponent class="loading" v-if="!loaded"></LoadingComponent>
+  <CardPage v-if="loaded" :card="currentCard"></CardPage>
 </template>
 
 <script>
 
 import {useCards} from "@/services/adapter";
 import CardPage from "@/components/CardPage.vue";
+import LoadingComponent from "@/components/LoadingComponent.vue";
 
 export default {
   name: 'PlayGame',
-  components: {CardPage},
+  components: {LoadingComponent, CardPage},
   data() {
     return {
       cards: [],
-      currentCard: {}
+      currentCard: {},
+      loaded: false
     }
   },
   mounted() {
@@ -28,6 +30,7 @@ export default {
       let response = await useCards().cardsList(this.$store.state.jwt);
       this.cards = response.data
       this.currentCard = this.cards[0]
+      this.loaded = true;
     },
     onClickBack() {
       this.$router.push('/')
@@ -37,5 +40,11 @@ export default {
 </script>
 
 <style scoped>
-
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 10px;
+}
 </style>

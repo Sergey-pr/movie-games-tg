@@ -6,12 +6,11 @@ import (
 	"github.com/Sergey-pr/movie-games-tg/muxserver/forms"
 	"github.com/Sergey-pr/movie-games-tg/utils"
 	"io"
-	"log"
 	"net/http"
 	"os"
 )
 
-// BotUpdates ...
+// BotUpdates is handling bot commands
 func BotUpdates(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -47,15 +46,12 @@ func BotUpdates(w http.ResponseWriter, r *http.Request) {
 	Ok(w)
 }
 
-// BotUpdates ...
+// BotImage returns image by id
 func BotImage(w http.ResponseWriter, r *http.Request) {
 	imageId := GetImageId(r)
 
-	img, err := os.Open(fmt.Sprintf("card_files/%s", imageId))
-	if err != nil {
-		log.Fatal(err) // perhaps handle this nicer
-	}
-	defer img.Close()
+	img := ObjOrPanic(os.Open(fmt.Sprintf("card_files/%s", imageId)))
+	defer OrPanic(img.Close())
 	w.Header().Set("Content-Type", "image/jpeg") // <-- set the content-type header
 	ObjOrPanic(io.Copy(w, img))
 

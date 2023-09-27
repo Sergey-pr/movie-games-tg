@@ -23,21 +23,22 @@ func CardCreate(w http.ResponseWriter, r *http.Request) {
 	OrPanic(ValidateForm(r, &form))
 
 	card := &models.Card{
-		Category:     form.Category,
-		NameRu:       form.NameRu,
-		DescRu:       form.DescRu,
-		QuoteRu:      form.QuoteRu,
-		NameEn:       form.NameEn,
-		DescEn:       form.DescEn,
-		QuoteEn:      form.QuoteEn,
-		FactsRu:      form.FactsRu,
-		FactsEn:      form.FactsEn,
-		AnswersRu:    form.AnswersRu,
-		AnswersEn:    form.AnswersEn,
-		DrawingId:    form.DrawingId,
-		PixelatedId:  form.PixelatedId,
-		ScreenshotId: form.ScreenshotId,
-		BackgroundId: form.BackgroundId,
+		Category:         form.Category,
+		NameRu:           form.NameRu,
+		DescRu:           form.DescRu,
+		QuoteRu:          form.QuoteRu,
+		NameEn:           form.NameEn,
+		DescEn:           form.DescEn,
+		QuoteEn:          form.QuoteEn,
+		FactsRu:          form.FactsRu,
+		FactsEn:          form.FactsEn,
+		AnswersRu:        form.AnswersRu,
+		AnswersEn:        form.AnswersEn,
+		DrawingId:        form.DrawingId,
+		PixelatedId:      form.PixelatedId,
+		ScreenshotId:     form.ScreenshotId,
+		BackgroundColor1: form.BackgroundColor1,
+		BackgroundColor2: form.BackgroundColor2,
 	}
 	OrPanic(card.Save(ctx))
 
@@ -129,8 +130,12 @@ func CardUpdate(w http.ResponseWriter, r *http.Request) {
 		card.ScreenshotId = form.ScreenshotId
 	}
 
-	if form.BackgroundId != "" && form.BackgroundId != card.BackgroundId {
-		card.BackgroundId = form.BackgroundId
+	if form.BackgroundColor1 != "" && form.BackgroundColor1 != card.BackgroundColor1 {
+		card.BackgroundColor1 = form.BackgroundColor1
+	}
+
+	if form.BackgroundColor2 != "" && form.BackgroundColor2 != card.BackgroundColor2 {
+		card.BackgroundColor2 = form.BackgroundColor2
 	}
 
 	OrPanic(card.Save(ctx))

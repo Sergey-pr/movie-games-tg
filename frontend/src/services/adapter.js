@@ -4,7 +4,8 @@ const urls = {
     login: 'api/public/login/',
     cards: 'api/cards/',
     userInfo: 'api/user/',
-    userChangeLang: 'api/user/lang/'
+    userChangeLang: 'api/user/lang/',
+    cardImageUrl: 'api/public/bot-image/'
 }
 
 export function createDynamicString(string, replaceParams) {
