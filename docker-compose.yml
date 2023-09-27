@@ -3,7 +3,6 @@ version: "3.9"
 services:
   frontend:
     build: frontend
-#    command: /root/main
     environment:
       - VUE_APP_BASE_URL=localhost:8888
     ports:
@@ -11,7 +10,6 @@ services:
 
   api:
     build: backend
-#    command: /root/main
     environment:
       - DATABASE='user=sergei password=regedit257 host=localhost port=5432 dbname=movie_games sslmode=disable'
     depends_on:

@@ -1,7 +1,6 @@
 FROM node:latest as build-stage
 WORKDIR /app
 COPY package*.json ./
-RUN npm install -D sass-loader sass
 RUN npm install
 COPY ./ .
 RUN npm run build
