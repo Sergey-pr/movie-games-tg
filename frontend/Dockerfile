@@ -1,9 +1,9 @@
 FROM node:latest as build-stage
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --verbose
+RUN node --max-old-space-size=250 `which npm` install
 COPY ./ .
-RUN npm run build
+RUN node --max-old-space-size=250 `which npm` run build
 
 FROM nginx as production-stage
 RUN mkdir /app
