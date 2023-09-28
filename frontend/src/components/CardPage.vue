@@ -62,7 +62,7 @@ export default {
     }
   },
   created() {
-    this.imgUrlPrefix = process.env.VUE_APP_BASE_URL + "/api/public/bot-image/";
+    this.imgUrlPrefix = "/api/public/bot-image/";
   },
   mounted() {
   },
