@@ -9,6 +9,6 @@ FROM nginx as production-stage
 RUN mkdir /app
 COPY --from=build-stage /app/dist /app
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY kuolker.ru.crt /etc/nginx/
-COPY kuolker.ru.key /etc/nginx/
+COPY kuolker.ru.crt /etc/nginx/kuolker.ru.crt
+COPY kuolker.ru.key /etc/nginx/kuolker.ru.key
 CMD ["nginx", "-g", "daemon off;"]
