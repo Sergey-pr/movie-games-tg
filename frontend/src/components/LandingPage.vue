@@ -72,6 +72,7 @@ export default {
     },
     changeLang() {
       this.setLanguage();
+      this.$store.commit('setLang', this.language)
       useUsers().changeLang(this.$store.state.jwt, this.language)
     },
     onClickStart() {

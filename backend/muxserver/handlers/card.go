@@ -39,6 +39,7 @@ func CardCreate(w http.ResponseWriter, r *http.Request) {
 		ScreenshotId:     form.ScreenshotId,
 		BackgroundColor1: form.BackgroundColor1,
 		BackgroundColor2: form.BackgroundColor2,
+		TextColor:        form.TextColor,
 	}
 	OrPanic(card.Save(ctx))
 
@@ -136,6 +137,10 @@ func CardUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if form.BackgroundColor2 != "" && form.BackgroundColor2 != card.BackgroundColor2 {
 		card.BackgroundColor2 = form.BackgroundColor2
+	}
+
+	if form.TextColor != "" && form.TextColor != card.TextColor {
+		card.TextColor = form.TextColor
 	}
 
 	OrPanic(card.Save(ctx))

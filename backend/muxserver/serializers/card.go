@@ -23,6 +23,7 @@ type card struct {
 	ScreenshotId     string      `json:"screenshot_id"`
 	BackgroundColor1 string      `json:"bg_color_1"`
 	BackgroundColor2 string      `json:"bg_color_2"`
+	TextColor        string      `json:"text_color"`
 }
 
 func Card(obj *models.Card) *card {
@@ -44,6 +45,7 @@ func Card(obj *models.Card) *card {
 		ScreenshotId:     obj.ScreenshotId,
 		BackgroundColor1: obj.BackgroundColor1,
 		BackgroundColor2: obj.BackgroundColor2,
+		TextColor:        obj.TextColor,
 	}
 }
 

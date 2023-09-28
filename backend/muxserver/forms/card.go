@@ -19,4 +19,5 @@ type Card struct {
 	ScreenshotId     string      `json:"screenshot_id"`
 	BackgroundColor1 string      `json:"bg_color_1"`
 	BackgroundColor2 string      `json:"bg_color_2"`
+	TextColor        string      `json:"text_color"`
 }

@@ -1,6 +1,7 @@
 <template>
   <LoadingComponent class="loading" v-if="!loaded"></LoadingComponent>
-  <CardPage v-if="loaded" :card="currentCard"></CardPage>
+  <CardPage v-if="loaded && !winState" :card="currentCard" @emit-win="win"></CardPage>
+  <CardInfoPage v-if="loaded && winState" :card="currentCard" @emit-next="next"></CardInfoPage>
 </template>
 
 <script>
@@ -8,14 +9,17 @@
 import {useCards} from "@/services/adapter";
 import CardPage from "@/components/CardPage.vue";
 import LoadingComponent from "@/components/LoadingComponent.vue";
+import CardInfoPage from "@/components/CardInfoPage.vue";
 
 export default {
   name: 'PlayGame',
-  components: {LoadingComponent, CardPage},
+  components: {CardInfoPage, LoadingComponent, CardPage},
   data() {
     return {
+      winState: false,
       cards: [],
       currentCard: {},
+      currentCardIndex: 0,
       loaded: false
     }
   },
@@ -29,11 +33,23 @@ export default {
 
       let response = await useCards().cardsList(this.$store.state.jwt);
       this.cards = response.data
-      this.currentCard = this.cards[0]
+      this.currentCard = this.cards[this.currentCardIndex]
       this.loaded = true;
     },
     onClickBack() {
       this.$router.push('/')
+    },
+    win() {
+      this.winState = true
+    },
+    next() {
+      this.winState = false
+      this.currentCardIndex += 1
+      if (this.currentCardIndex >= this.cards.length) {
+        this.currentCardIndex = 0
+      }
+      console.log(this.currentCardIndex)
+      this.currentCard = this.cards[this.currentCardIndex]
     }
   }
 }

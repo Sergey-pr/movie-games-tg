@@ -143,6 +143,11 @@ func (obj *CardProcessor) addCard(ctx context.Context, form *forms.BotUpdate) er
 		if err != nil {
 			return err
 		}
+	case 16:
+		err = obj.processAddTextColor(ctx, form.Message.Text)
+		if err != nil {
+			return err
+		}
 	default:
 		err = obj.processError()
 		if err != nil {
@@ -152,7 +157,7 @@ func (obj *CardProcessor) addCard(ctx context.Context, form *forms.BotUpdate) er
 	return nil
 }
 
-func (obj *CardProcessor) processAddBackgroundColor2(ctx context.Context, msg string) error {
+func (obj *CardProcessor) processAddTextColor(ctx context.Context, msg string) error {
 	var answer string
 	if obj.User.Language == "ru" {
 		answer = fmt.Sprintf("Цвет: %s\n\nКарточка готова!", msg)
@@ -164,7 +169,7 @@ func (obj *CardProcessor) processAddBackgroundColor2(ctx context.Context, msg st
 		return err
 	}
 
-	obj.Card.BackgroundColor2 = msg
+	obj.Card.TextColor = msg
 	obj.Card.Completed = true
 	err = obj.Card.Save(ctx)
 	if err != nil {
@@ -174,6 +179,32 @@ func (obj *CardProcessor) processAddBackgroundColor2(ctx context.Context, msg st
 	obj.State = 0
 	obj.Card = nil
 	obj.CardId = nil
+	err = obj.Save(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (obj *CardProcessor) processAddBackgroundColor2(ctx context.Context, msg string) error {
+	var answer string
+	if obj.User.Language == "ru" {
+		answer = fmt.Sprintf("Цвет: %s\n\nТеперь добавим цвет текста!", msg)
+	} else {
+		answer = fmt.Sprintf("Color: %s\n\nNow let's add the text color!", msg)
+	}
+	err := utils.SendBotMessage(obj.ChatId, answer)
+	if err != nil {
+		return err
+	}
+
+	obj.Card.BackgroundColor2 = msg
+	err = obj.Card.Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	obj.State = 16
 	err = obj.Save(ctx)
 	if err != nil {
 		return err

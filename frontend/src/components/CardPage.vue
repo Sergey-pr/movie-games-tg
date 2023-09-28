@@ -1,7 +1,22 @@
 <template>
   <div class="card" :style="{background: 'linear-gradient(45deg, ' + card.bg_color_1 + ', ' + card.bg_color_2 + ')'}">
-    <h1 class="category">{{ category }}</h1>
-    <img class="drawing" :src="imgUrlPrefix + card.drawing_id">
+    <div class="card-block ">
+      <h1 class="drawing-label">{{ drawingTitle }}</h1>
+      <img alt="drawing" class="drawing" :src="imgUrlPrefix + card.drawing_id">
+    </div>
+    <div id="section1" class="card-block" v-if="state >= 1">
+      <h1 class="quote-label">{{ quoteTitle }}</h1>
+      <div class="quote">
+        <p :style="{color: card.text_color}">{{ quote }}</p>
+      </div>
+    </div>
+    <div id="section2" class="card-block" v-if="state >= 2">
+      <h1>{{ pixelatedTitle }}</h1>
+      <img alt="pixelated" class="pixelated" :src="imgUrlPrefix + card.pixelated_id">
+    </div>
+  </div>
+  <div class="answers">
+    <PrimeButton class="btn" :key="key" :label="key" v-for="(value, key) in answers" :disabled="value" @click="this.processAnswer(key)"></PrimeButton>
   </div>
 </template>
 
@@ -33,64 +48,128 @@ export default {
     return {
       category: "Movie",
       language: "en",
+      drawingTitle: "Drawing",
+      quoteTitle: "Quote",
+      pixelatedTitle: "Screenshot",
       user: {},
-      loaded: false
+      loaded: false,
+      quote: "",
+      answers: {},
+      name: "",
+      state: 0,
+      winPopupConfig: {},
+      losePopupConfig: {},
     }
   },
   created() {
     this.imgUrlPrefix = process.env.VUE_APP_BASE_URL + "/api/public/bot-image/";
   },
   mounted() {
-    // this.init();
   },
   methods: {
     async init() {
       this.user = this.$store.state.user
+      window.Telegram.WebApp.MainButton.hide()
       this.setLanguage();
-      this.setPopup();
     },
     setLanguage() {
       this.language = this.user.language
       if (this.language === "ru") {
-        window.Telegram.WebApp.MainButton.text = "Ответить"
         switch (this.card.category) {
           case "movie":
             this.category = "Фильм"
         }
+        this.card.answers_ru.forEach((element) => {
+          this.answers[element] = false
+        })
+        this.name = this.card.name_ru
+        this.quote = this.card.quote_ru
+        this.drawingTitle = "Рисунок"
+        this.quoteTitle = "Цитата"
+        this.pixelatedTitle = "Кадр из фильма"
+        this.winPopupConfig = {
+          title: "Верно",
+          message: "Вы правильно угадали название:\n" + this.name,
+          buttons: [
+            {
+              text: "Дальше"
+            }
+          ]
+        }
+        this.losePopupConfig = {
+          title: "Неверно",
+          message: "Правильный ответ:\n" + this.name,
+          buttons: [
+            {
+              text: "Дальше"
+            }
+          ]
+        }
       } else {
-        window.Telegram.WebApp.MainButton.text = "Answer"
         switch (this.card.category) {
           case "movie":
             this.category = "Movie"
         }
+        this.card.answers_en.forEach((element) => {
+          this.answers[element] = false
+        })
+        this.name = this.card.name_en
+        this.quote = this.card.quote_en
+        this.winPopupConfig = {
+          title: "Correct",
+          message: "You answered correctly, movie name is:\n" + this.name,
+          buttons: [
+            {
+              text: "Next"
+            }
+          ]
+        }
+        this.losePopupConfig = {
+          title: "Wrong",
+          message: "The correct answer is:\n" + this.name,
+          buttons: [
+            {
+              text: "Next"
+            }
+          ]
+        }
       }
     },
-    showPopup() {
-      window.Telegram.WebApp.showPopup({title: "title", message: "message", buttons: [
-          {
-            "id": 1,
-            "text": "btn1"
-          },
-          {
-            "id": 2,
-            "text": "btn2"
-          },
-          {
-            "id": 3,
-            "text": "btn3"
-          }
-        ]}, this.callback)
+    async processAnswer(item) {
+      if (item === this.name) {
+        this.win()
+      } else if (this.state <= 1) {
+        this.state += 1
+        this.answers[item] = true
+        await this.delay(100)
+        this.scrollToId()
+      } else {
+        this.lose()
+      }
     },
-    callback(id) {
-      console.log(id)
-
+    scrollToId() {
+      let access = document.getElementById("section" + this.state);
+      access.scrollIntoView({behavior: 'smooth'}, true);
+    },
+    delay(time) {
+      return new Promise(resolve => setTimeout(resolve, time));
+    },
+    win() {
+      window.Telegram.WebApp.showPopup(this.winPopupConfig, this.emitWinState)
+    },
+    lose() {
+      window.Telegram.WebApp.showPopup(this.losePopupConfig, this.emitWinState)
+    },
+    emitWinState() {
+      this.$emit("emit-win")
     }
   }
 }
 </script>
 
-<style scoped>
-.category {
+<style>
+
+h1 {
   color: var(--tg-theme-text-color);
   background-color: var(--tg-theme-secondary-bg-color);
 }
@@ -100,12 +179,57 @@ export default {
   top: 20px;
   right: 10px;
   left: 10px;
+  margin-bottom: 20px;
   border-radius: 25px;
-  height: 1200px;
+}
+
+.card-block {
+  height: 500px;
+  scroll-snap-align: start;
 }
 
 .drawing {
-  max-width: 300px;
-  max-height: 300px;
+  max-width: 250px;
+  max-height: 250px;
 }
+
+.pixelated {
+  max-width: 250px;
+  max-height: 250px;
+}
+
+.quote-label {
+}
+
+.quote {
+  color: white;
+  font-weight: bold;
+  font-size: 25px;
+}
+
+.answers {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+}
+
+.p-button {
+  background-color: var(--tg-theme-button-color);
+  border: none;
+}
+
+.p-button:enabled:hover {
+  background-color: var(--tg-theme-button-color);
+  border: none;
+}
+
+.p-button-label {
+  color: var(--tg-theme-button-text-color);
+}
+
+body {
+  scroll-behavior: smooth;
+}
+
 </style>

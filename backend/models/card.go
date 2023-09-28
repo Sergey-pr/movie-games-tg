@@ -30,6 +30,7 @@ type Card struct {
 	ScreenshotId     string      `db:"screenshot_id"`
 	BackgroundColor1 string      `db:"bg_color_1"`
 	BackgroundColor2 string      `db:"bg_color_2"`
+	TextColor        string      `db:"text_color"`
 	Completed        bool        `db:"completed"`
 }
 
