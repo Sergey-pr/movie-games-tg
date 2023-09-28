@@ -1,7 +1,7 @@
 <template>
-  <div class="card">
+  <div class="card" :style="{background: 'linear-gradient(45deg, ' + card.bg_color_1 + ', ' + card.bg_color_2 + ')'}">
     <h1 class="category">{{ category }}</h1>
-    <img :src="imgUrlPrefix + card.drawing_id">
+    <img class="drawing" :src="imgUrlPrefix + card.drawing_id">
   </div>
 </template>
 
@@ -47,6 +47,7 @@ export default {
     async init() {
       this.user = this.$store.state.user
       this.setLanguage();
+      this.setPopup();
     },
     setLanguage() {
       this.language = this.user.language
@@ -64,6 +65,26 @@ export default {
         }
       }
     },
+    showPopup() {
+      window.Telegram.WebApp.showPopup({title: "title", message: "message", buttons: [
+          {
+            "id": 1,
+            "text": "btn1"
+          },
+          {
+            "id": 2,
+            "text": "btn2"
+          },
+          {
+            "id": 3,
+            "text": "btn3"
+          }
+        ]}, this.callback)
+    },
+    callback(id) {
+      console.log(id)
+
+    }
   }
 }
 </script>
@@ -71,15 +92,20 @@ export default {
 <style scoped>
 .category {
   color: var(--tg-theme-text-color);
+  background-color: var(--tg-theme-secondary-bg-color);
 }
 
 .card {
-  background: linear-gradient(45deg, #6262e0, #bb4d4d);
   position: absolute;
   top: 20px;
   right: 10px;
   left: 10px;
   border-radius: 25px;
   height: 1200px;
+}
+
+.drawing {
+  max-width: 300px;
+  max-height: 300px;
 }
 </style>

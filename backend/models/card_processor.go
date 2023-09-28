@@ -165,6 +165,7 @@ func (obj *CardProcessor) processAddBackgroundColor2(ctx context.Context, msg st
 	}
 
 	obj.Card.BackgroundColor2 = msg
+	obj.Card.Completed = true
 	err = obj.Card.Save(ctx)
 	if err != nil {
 		return err
@@ -420,7 +421,7 @@ func (obj *CardProcessor) processAddRussianAnswers(ctx context.Context, msg stri
 	var answer string
 	if slice.Contains(NegativeAnswersSlice, msg) {
 		if obj.User.Language == "ru" {
-			answer = "Теперь добавим факты о фильме. Их нужно перечислить через запятую."
+			answer = "Теперь добавим факты о фильме. Их нужно перечислить через \";\"."
 		} else {
 			answer = "Now let's add interesting facts about the movie. Type them with \";\" as delimiter."
 		}
@@ -439,9 +440,9 @@ func (obj *CardProcessor) processAddRussianAnswers(ctx context.Context, msg stri
 			}
 		}
 		if obj.User.Language == "ru" {
-			answer = fmt.Sprintf("Русские варианты ответов:\n%s\n\nТеперь добавим изображение рисунка. Оно должно быть с прозрачным фоном.", strings.Join(answers, "\n"))
+			answer = fmt.Sprintf("Русские варианты ответов:\n%s\n\nТеперь добавим интересные факты на английском. Их нужно перечислить через \";\".", strings.Join(answers, "\n"))
 		} else {
-			answer = fmt.Sprintf("Russian answers are:\n%s\n\nNow let's add a drawing image. It should be with a transparent background.", strings.Join(answers, "\n"))
+			answer = fmt.Sprintf("Russian answers are:\n%s\n\nNow let's add interesting facts. Type them with \";\" as delimiter.", strings.Join(answers, "\n"))
 		}
 		obj.Card.AnswersRu = utils.ToGenericArray(answers)
 		err := obj.Card.Save(ctx)

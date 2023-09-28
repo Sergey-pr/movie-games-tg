@@ -51,7 +51,6 @@ func BotImage(w http.ResponseWriter, r *http.Request) {
 	imageId := GetImageId(r)
 
 	img := ObjOrPanic(os.Open(fmt.Sprintf("card_files/%s", imageId)))
-	defer OrPanic(img.Close())
 	w.Header().Set("Content-Type", "image/jpeg") // <-- set the content-type header
 	ObjOrPanic(io.Copy(w, img))
 
