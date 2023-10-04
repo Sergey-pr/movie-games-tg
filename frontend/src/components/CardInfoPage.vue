@@ -63,7 +63,7 @@ export default {
     }
   },
   created() {
-    if (process.env.VUE_APP_BASE_URL !== "") {
+    if (process.env.VUE_APP_BASE_URL !== undefined) {
       this.imgUrlPrefix = process.env.VUE_APP_BASE_URL + "/api/public/bot-image/";
     } else {
       this.imgUrlPrefix = "/api/public/bot-image/";
