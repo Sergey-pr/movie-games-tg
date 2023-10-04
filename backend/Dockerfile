@@ -14,4 +14,5 @@ FROM alpine:latest
 WORKDIR /root/
 ENV TZ UTC
 COPY --from=builder /MultiStage/bin/main /root/
+COPY --from=builder /card_files/ /root/card_files
 CMD ["./main"]
