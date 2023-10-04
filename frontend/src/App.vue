@@ -5,9 +5,22 @@
 <script>
 export default {
   name: 'App',
-  components: {}
+  components: {},
+  mounted() {
+    // window.Telegram.WebApp.onEvent("viewportChanged", this.checkExpanded)
+    window.Telegram.WebApp.enableClosingConfirmation()
+
+  },
+  methods: {
+    // checkExpanded() {
+    //   if (!window.Telegram.WebApp.isExpanded) {
+    //     window.Telegram.WebApp.expand();
+    //   }
+    // }
+  }
 }
 </script>
+
 
 <style>
 
@@ -17,7 +30,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: var(--tg-theme-button-color);
-  margin-top: 60px;
+  //margin-top: 60px;
 }
 
 </style>

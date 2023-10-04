@@ -1,19 +1,30 @@
 <template>
   <LoadingComponent class="loading" v-if="!loaded"></LoadingComponent>
-  <div class="main" v-if="loaded">
-    <div class="lang-changer">
-      <p class="lang">RU🇷🇺</p>
-      <label class="switch">
-        <input type="checkbox" v-model="language" true-value="en" false-value="ru"  @change="changeLang()">
-        <span class="slider round"></span>
-      </label>
-      <p class="lang">EN🇬🇧</p>
+  <div class="container" v-if="loaded">
+    <div class="top-card">
+      <div class="lang-changer">
+        <p class="lang">RU🇷🇺</p>
+        <label class="switch">
+          <input type="checkbox" v-model="language" true-value="en" false-value="ru"  @change="changeLang()">
+          <span class="slider round"></span>
+        </label>
+        <p class="lang">EN🇬🇧</p>
+      </div>
+      <img v-if="language === 'ru'" class="logo" alt="Game logo" src="./../assets/logo_ru.png">
+      <img v-if="language === 'en'" class="logo" alt="Game logo" src="./../assets/logo_en.png">
+      <h1 class="welcome-message">{{ welcomeMessage }}{{ userName }}</h1>
+      <h3 class="description">{{ description }}</h3>
+      <button class="btn-start" @click="this.onClickStart()">
+        <p class="btn-start-label">{{ startLabel }}</p>
+      </button>
     </div>
-    <img class="logo" alt="Game logo" src="./../assets/logo.png">
-    <h1 class="welcome-message">{{ welcomeMessage }}{{ userName }}</h1>
-    <h3 class="description">{{ description }}</h3>
+    <div class="block-pink">
+      <img class="landing-drawing" alt="Game drawing" src="./../assets/drawing.png">
+      <button class="btn-rules" @click="this.onClickRules()">
+        <p class="btn-rules-label">{{ rulesLabel }}</p>
+      </button>
+    </div>
   </div>
-
 </template>
 
 <script>
@@ -33,6 +44,8 @@ export default {
       userName: "",
       language: "en",
       loaded: false,
+      startLabel: "",
+      rulesLabel: "",
     }
   },
   created() {
@@ -40,13 +53,17 @@ export default {
   },
   methods: {
     async init() {
-      window.Telegram.WebApp.ready()
       let initData = window.Telegram.WebApp.initData
+      // Here we parse init data as json object, because we get it as string
       let body = JSON.parse('{"' + initData.replace(/&/g, '","').replace(/=/g,'":"') + '"}', function(key, value) { return key===""?value:decodeURIComponent(value) });
+      // We need to parse user too
       body.user = JSON.parse(body.user)
+      // Send login request to log in and verify initData hash
       let response = await useAuth().login(body);
+      // TODO process fake data error
+      // Set token to store
       this.$store.commit('setJwt', response.data["token"])
-
+      // Get user data
       response = await useUsers().user(response.data["token"]);
       this.user = response.data
       this.userName = response.data["name"]
@@ -54,20 +71,24 @@ export default {
       this.$store.commit('setUser', response.data)
 
       window.Telegram.WebApp.BackButton.hide()
-      window.Telegram.WebApp.MainButton.show()
-      window.Telegram.WebApp.onEvent('mainButtonClicked', this.onClickStart)
+      window.Telegram.WebApp.MainButton.hide()
+      // Set up translations
       this.setLanguage();
+      // Tell telegram that the app is ready
+      await window.Telegram.WebApp.ready()
       this.loaded = true;
     },
     setLanguage() {
       if (this.language === "ru") {
-        window.Telegram.WebApp.MainButton.text = "Начать"
         this.welcomeMessage = "Привет "
         this.description = "Давай сыграем в игру на знание известных фильмов. Здесь ты проверишь свои знания и узнаешь о новых интересных фильмах."
+        this.startLabel = "СТАРТ"
+        this.rulesLabel = "ПРАВИЛА"
       } else {
-        window.Telegram.WebApp.MainButton.text = "Start"
         this.welcomeMessage = "Welcome "
         this.description = "Let's see how good is your movie knowledge. You will try to guess movie names and learn about famous movies."
+        this.startLabel = "START"
+        this.rulesLabel = "RULES"
       }
     },
     changeLang() {
@@ -77,7 +98,10 @@ export default {
     },
     onClickStart() {
       this.$router.push('/play')
-    }
+    },
+    onClickRules() {
+      this.$router.push('/rules')
+    },
   }
 
 }
@@ -94,26 +118,33 @@ export default {
 
 .welcome-message {
   margin: 10px;
-  color: var(--tg-theme-text-color);
+  color: #ffffff;
+  background: transparent;
+  font-weight: bold;
+  font-size: 40px;
 }
 
 .description {
   margin: 10px;
-  color: var(--tg-theme-hint-color);
+  color: #999999;
 }
 
 body {
   background-color: var(--tg-theme-bg-color);
+  margin: 0;
 }
 
-.main {
-  position: absolute;
-  top: 20px;
-  bottom: 20px;
-  right: 10px;
-  left: 10px;
-  border-radius: 25px;
-  background-color: var(--tg-theme-secondary-bg-color);
+.container {
+  //background-color: #cc7676;
+  background: linear-gradient(#cc7676, #d0a67f);
+  margin: 0 45px 20px;
+  border-radius: 0 0 25px 25px;
+  box-shadow: 15px 15px 30px rgba(0, 0, 0, .3);
+}
+
+.top-card {
+  background-color: #433789;
+  border-radius: 0 0 50% 50% / 85% 85% 15% 15% ;
 }
 
 .lang {
@@ -124,9 +155,10 @@ body {
 }
 
 .lang-changer {
-  margin: 5px;
+  padding-top: 20px;
   display: flex;
-  float: right;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo {
@@ -139,8 +171,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: var(--tg-theme-button-color);
-  margin-top: 60px;
 }
 
 /* The switch - the box around the slider */
@@ -193,6 +223,44 @@ input:checked + .slider:before {
   -webkit-transform: translateX(26px);
   -ms-transform: translateX(26px);
   transform: translateX(26px);
+}
+
+.btn-start {
+  background: transparent;
+  border: none;
+}
+
+.btn-start-label {
+  font-weight: bold;
+  font-size: 40px;
+  color: #ffffff;
+}
+
+.btn-rules {
+  color: #ffffff;
+  background-color: #433789;
+  font-weight: normal;
+  font-size: 25px;
+  border: none;
+  display: block;
+  width: 100%;
+  height: 50px;
+  padding: 0;
+  margin: 0;
+}
+
+.btn-rules-label {
+  padding: 0;
+  margin: 0;
+}
+
+.landing-drawing {
+  max-width: 225px;
+  max-height: 225px;
+}
+
+.block-pink {
+  padding-bottom: 20px;
 }
 
 </style>

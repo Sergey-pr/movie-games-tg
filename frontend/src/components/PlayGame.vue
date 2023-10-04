@@ -20,7 +20,7 @@ export default {
       cards: [],
       currentCard: {},
       currentCardIndex: 0,
-      loaded: false
+      loaded: false,
     }
   },
   mounted() {

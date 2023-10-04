@@ -5,15 +5,16 @@ import { createRouter, createWebHistory } from "vue-router"
 import App from './App.vue'
 import PlayGame from './components/PlayGame.vue'
 import LandingPage from './components/LandingPage.vue'
-
-import Button from 'primevue/button';
+import RulesComponent from "@/components/RulesComponent.vue";
 
 import 'primevue/resources/themes/bootstrap4-light-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
 
+
 const routes = [
     { path: '/', component: LandingPage },
     { path: '/play', component: PlayGame },
+    { path: '/rules', component: RulesComponent },
 ]
 
 const router = createRouter({
@@ -44,6 +45,5 @@ const store = createStore({
 const app = createApp(App)
 app.use(router)
 app.use(store)
-app.component('PrimeButton', Button);
 
 app.mount('#app')
