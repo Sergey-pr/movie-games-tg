@@ -27,6 +27,7 @@ type CardProcessor struct {
 	ChatId int   `db:"-"`
 }
 
+// ProcessMsg gets the message updates card and return value
 func (obj *CardProcessor) ProcessMsg(ctx context.Context, form *forms.BotUpdate) error {
 	if obj.State != 0 && form.Message.Text != "/stop" {
 		err := obj.addCard(ctx, form)
@@ -60,6 +61,7 @@ func (obj *CardProcessor) ProcessMsg(ctx context.Context, form *forms.BotUpdate)
 	return nil
 }
 
+// addCard is a processor bo adding new card
 func (obj *CardProcessor) addCard(ctx context.Context, form *forms.BotUpdate) error {
 	var err error
 	switch obj.State {
@@ -784,7 +786,7 @@ func (obj *CardProcessor) processError() error {
 	return nil
 }
 
-// Save card instance in DB
+// Save processor instance in DB
 func (obj *CardProcessor) Save(ctx context.Context) error {
 	var err error
 	if obj.Id == 0 {
@@ -799,7 +801,7 @@ func (obj *CardProcessor) Save(ctx context.Context) error {
 	return nil
 }
 
-// createCard private method for create new cards DB record
+// create private method to create new processor DB record
 func (obj *CardProcessor) create(ctx context.Context) error {
 	insert := persist.Db.Insert(CardProcessorsTableName).
 		Rows(obj).
@@ -811,7 +813,7 @@ func (obj *CardProcessor) create(ctx context.Context) error {
 	return nil
 }
 
-// updateCard private method for update card record in DB
+// update private method to update processor record in DB
 func (obj *CardProcessor) update(ctx context.Context) error {
 	update := persist.Db.From(CardProcessorsTableName).
 		Where(goqu.C("id").Eq(obj.Id)).Update().Set(obj).
@@ -823,7 +825,7 @@ func (obj *CardProcessor) update(ctx context.Context) error {
 	return nil
 }
 
-// Delete delete card from DB
+// Delete processor from DB
 func (obj *CardProcessor) Delete(ctx context.Context) error {
 	_, err := persist.Db.From(CardProcessorsTableName).
 		Where(goqu.Ex{"id": obj.Id}).

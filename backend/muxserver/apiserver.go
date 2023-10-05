@@ -37,12 +37,15 @@ func NewApiServer() *ApiServer {
 
 	private.HandleFunc("/user/", handlers.UserInfo).Methods(http.MethodGet).Name("")
 	private.HandleFunc("/user/lang/", handlers.UserChangeLang).Methods(http.MethodPost).Name("")
+	private.HandleFunc("/user/answer/", handlers.UserProcessAnswer).Methods(http.MethodPost).Name("")
 
 	private.HandleFunc("/cards/", handlers.CardsList).Methods(http.MethodGet).Name("")
 	private.HandleFunc("/cards/", handlers.CardCreate).Methods(http.MethodPost).Name("")
 	private.HandleFunc("/cards/{id}/", handlers.CardDelete).Methods(http.MethodDelete).Name("")
 	private.HandleFunc("/cards/{id}/", handlers.CardInfo).Methods(http.MethodGet).Name("")
 	private.HandleFunc("/cards/{id}/", handlers.CardUpdate).Methods(http.MethodPost).Name("")
+
+	private.HandleFunc("/leaderboard/", handlers.Leaderboard).Methods(http.MethodGet).Name("")
 
 	return &ApiServer{
 		name:   "API",

@@ -1,18 +1,13 @@
 <template>
   <LoadingComponent class="loading" v-if="!loaded"></LoadingComponent>
-  <div class="main" v-if="loaded">
-    <h1 class="rules-label">{{ rulesLabel }}</h1>
+  <div class="rules-card" v-if="loaded">
+    <h1 id="rules-label">{{ rulesLabel }}</h1>
     <h3 class="rules-sub-label">{{ rulesLabel1 }}</h3>
     <p class="rules-text">{{ rules1 }}</p>
     <h3 class="rules-sub-label">{{ rulesLabel2 }}</h3>
     <p class="rules-text">{{ rules2 }}</p>
     <h3 class="rules-sub-label">{{ rulesLabel3 }}</h3>
     <p class="rules-text">{{ rules3 }}</p>
-    <div class="buttons">
-      <button class="btn" @click="this.onClickBack()">
-        <p class="btn-label">{{ backLabel }}</p>
-      </button>
-    </div>
   </div>
 </template>
 
@@ -36,10 +31,9 @@ export default {
       rulesLabel3: "",
       rules3: "",
       rulesLabel: "",
-      backLabel: ""
     }
   },
-  created() {
+  mounted() {
     this.init();
     this.loaded = true
   },
@@ -54,7 +48,7 @@ export default {
     setLanguage() {
       this.language = this.user.language
       if (this.language === "ru") {
-        this.backLabel = "Назад"
+        window.Telegram.WebApp.MainButton.text = "Назад"
         this.rulesLabel = "Правила"
         this.rulesLabel1 = "1 часть"
         this.rules1 = "Нужно отгадать фильм по стилистическому рисунку. "+
@@ -71,7 +65,7 @@ export default {
             "За угаданный фильм по стилизованному кадру участник получает 1 балла. И он может перейти на другую карточку. " +
             "Если фильм не угадан, то участник может перевернуть карточку и посмотреть ответ."
       } else {
-        this.backLabel = "Back"
+        window.Telegram.WebApp.MainButton.text = "Back"
         this.rulesLabel = "Rules"
         this.rulesLabel1 = "Part 1"
         this.rules1 = "You need to guess the film based on its stylistic drawing. "+
@@ -108,55 +102,33 @@ export default {
 
 .rules-text {
   margin: 10px;
-  color: var(--tg-theme-hint-color);
+  color: white;
+  text-align: justify;
 }
 
-.rules-label {
+#rules-label {
   margin: 10px;
-  color: var(--tg-theme-text-color);
+  color: white;
+  background: transparent;
 }
 
 .rules-sub-label {
   padding-top: 5px;
   padding-bottom: 5px;
-  color: #ffffff;
-  background-color: #000000;
+  color: white;
+  background-color: #433789;
 }
 
 body {
   background-color: var(--tg-theme-bg-color);
 }
 
-.main {
-  position: absolute;
-  top: 20px;
-  right: 10px;
-  left: 10px;
-  margin-bottom: 20px;
-  border-radius: 25px;
-  background-color: var(--tg-theme-secondary-bg-color);
-}
-
-.buttons {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-}
-
-.btn {
-  background-color: #000000;
-  border: none;
-  color: #ffffff;
-  font-weight: bold;
-  font-size: 25px;
-  margin: 10px;
-  border-radius: 5px;
-}
-
-.btn-label {
-  margin: 5px;
+.rules-card {
+  margin: 0 60px 20px;
+  border-radius: 0 0 25px 25px;
+  overflow: auto;
+  box-shadow: 15px 15px 30px rgba(0, 0, 0, .3);
+  background: linear-gradient(#b96977, #936e4f);
 }
 
 </style>

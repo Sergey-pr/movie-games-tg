@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"github.com/Sergey-pr/movie-games-tg/persist"
-	"github.com/Sergey-pr/movie-games-tg/utils"
 	"github.com/Sergey-pr/movie-games-tg/utils/jwt"
 	"github.com/doug-martin/goqu/v9"
 	"time"
@@ -16,13 +15,12 @@ const (
 )
 
 type User struct {
-	Id            int         `db:"id" goqu:"skipupdate,skipinsert"`
-	TelegramId    int         `db:"telegram_id"`
-	Name          string      `db:"name"`
-	UserName      string      `db:"username"`
-	Language      string      `db:"language"`
-	AnsweredCards utils.JSONB `db:"answered_cards"`
-	IsAdmin       bool        `db:"is_admin"`
+	Id         int    `db:"id" goqu:"skipupdate,skipinsert"`
+	TelegramId int    `db:"telegram_id"`
+	Name       string `db:"name"`
+	UserName   string `db:"username"`
+	Language   string `db:"language"`
+	IsAdmin    bool   `db:"is_admin"`
 }
 
 // LoginUser find user in DB and check password
@@ -35,7 +33,22 @@ func LoginUser(ctx context.Context, telegramId int) (*User, error) {
 	return user, nil
 }
 
-// GetUserByTelegramId return user object by expression
+func GetUsersNamesByIds(ctx context.Context, ids []int) (map[int]string, error) {
+	var objs []*User
+	err := persist.Db.From(UsersTableName).Where(
+		goqu.Ex{"id": ids},
+	).ScanStructsContext(ctx, &objs)
+	if err != nil {
+		return nil, err
+	}
+	data := make(map[int]string)
+	for _, obj := range objs {
+		data[obj.Id] = obj.Name
+	}
+	return data, nil
+}
+
+// GetUserByTelegramId return user object by its telegram id
 func GetUserByTelegramId(ctx context.Context, telegramId int) (*User, error) {
 	var obj User
 	exists, err := persist.Db.From(UsersTableName).Where(
@@ -50,7 +63,7 @@ func GetUserByTelegramId(ctx context.Context, telegramId int) (*User, error) {
 	return &obj, nil
 }
 
-// GetUserById return user object by expression
+// GetUserById return user object by user id
 func GetUserById(ctx context.Context, userId int) (*User, error) {
 	var obj User
 	exists, err := persist.Db.From(UsersTableName).Where(
@@ -65,6 +78,7 @@ func GetUserById(ctx context.Context, userId int) (*User, error) {
 	return &obj, nil
 }
 
+// GetBotProcessor return bot processor object by chat id
 func (obj *User) GetBotProcessor(ctx context.Context, chatId int) (*CardProcessor, error) {
 	var processor CardProcessor
 	exists, err := persist.Db.From(CardProcessorsTableName).Where(
@@ -102,13 +116,13 @@ func (obj *User) GetBotProcessor(ctx context.Context, chatId int) (*CardProcesso
 	return &processor, nil
 }
 
+// GetJwtToken return JWT token to use as auth method
 func (obj *User) GetJwtToken() (string, time.Time, error) {
 	return jwt.GetJwtToken(&jwt.Claims{
 		User: jwt.UserClaims{
-			Id:            obj.Id,
-			TelegramId:    obj.TelegramId,
-			Name:          obj.Name,
-			AnsweredCards: obj.AnsweredCards,
+			Id:         obj.Id,
+			TelegramId: obj.TelegramId,
+			Name:       obj.Name,
 		},
 	})
 }
@@ -128,7 +142,7 @@ func (obj *User) Save(ctx context.Context) error {
 	return nil
 }
 
-// createUser private method for create new users DB record
+// create private method to create new user DB record
 func (obj *User) create(ctx context.Context) error {
 	insert := persist.Db.Insert(UsersTableName).
 		Rows(obj).
@@ -140,7 +154,7 @@ func (obj *User) create(ctx context.Context) error {
 	return nil
 }
 
-// updateUser private method for update user record in DB
+// update private method to update user record in DB
 func (obj *User) update(ctx context.Context) error {
 	update := persist.Db.From(UsersTableName).
 		Where(goqu.C("id").Eq(obj.Id)).Update().Set(obj).
@@ -152,7 +166,7 @@ func (obj *User) update(ctx context.Context) error {
 	return nil
 }
 
-// Delete delete user from DB
+// Delete user from DB
 func (obj *User) Delete(ctx context.Context) error {
 	_, err := persist.Db.From(UsersTableName).
 		Where(goqu.Ex{"id": obj.Id}).

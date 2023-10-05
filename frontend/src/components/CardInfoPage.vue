@@ -14,7 +14,7 @@
     <svg class="starSVG" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="30" height="30">
       <polygon fill=#FFD024 points="15 0.001 20.25 8.987 30 11.46 23.495 19.487 24.27 30.001 15 25.976 5.73 30.001 6.505 19.487 0 11.46 9.75 8.987" />
     </svg>
-    <p class="points-label">{{ pointsText }}: 30</p>
+    <p class="points-label">{{ pointsText }}: {{ points }}</p>
     <svg class="starSVG" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="30" height="30">
       <polygon fill=#FFD024 points="15 0.001 20.25 8.987 30 11.46 23.495 19.487 24.27 30.001 15 25.976 5.73 30.001 6.505 19.487 0 11.46 9.75 8.987" />
     </svg>
@@ -26,13 +26,15 @@
 export default {
   name: 'CardInfoPage',
   components: {},
+  emits: ["emit-next"],
   props: {
     card: {
       type: Object,
       default() {
         return {}
       }
-    }
+    },
+    points: Number
   },
   watch: {
     $props: {
@@ -74,12 +76,11 @@ export default {
   methods: {
     async init() {
       this.user = this.$store.state.user
-      window.Telegram.WebApp.MainButton.show()
       window.Telegram.WebApp.onEvent('mainButtonClicked', this.emitNext)
+      window.Telegram.WebApp.MainButton.show()
       this.background = 'linear-gradient(45deg, ' + this.card.bg_color_1 + ', ' + this.card.bg_color_2 + ')'
       this.textColor = this.card.text_color
       this.setLanguage();
-      this.scrollToScreenshot();
     },
     setLanguage() {
       this.language = this.user.language
@@ -100,10 +101,6 @@ export default {
     },
     emitNext() {
       this.$emit("emit-next")
-    },
-    scrollToScreenshot() {
-      let access = document.getElementById("screenshot");
-      access.scrollIntoView({behavior: 'smooth'}, true);
     },
   }
 }

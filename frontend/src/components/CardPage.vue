@@ -6,13 +6,13 @@
       </div>
       <p class="block-label">{{ drawingTitle }}</p>
     </div>
-    <div id="section1" class="card-block" v-if="state >= 1">
+    <div id="section2" class="card-block" v-if="points <= 2">
       <div class="content-block">
         <p class="quote" :style="{color: card.text_color}">{{ quote }}</p>
       </div>
       <p class="block-label">{{ quoteTitle }}</p>
     </div>
-    <div id="section2" class="card-block" v-if="state >= 2">
+    <div id="section1" class="card-block" v-if="points <= 1">
       <div class="content-block">
         <img alt="pixelated" class="pixelated" :src="imgUrlPrefix + card.pixelated_id">
       </div>
@@ -42,6 +42,7 @@
 export default {
   name: 'CardPage',
   components: {},
+  emits: ["emit-win"],
   props: {
     card: {
       type: Object,
@@ -73,7 +74,7 @@ export default {
       quote: "",
       answers: {},
       name: "",
-      state: 0,
+      points: 3,
       winPopupConfig: {},
       losePopupConfig: {},
       imgUrlPrefix: "",
@@ -166,39 +167,43 @@ export default {
     async processAnswer(item) {
       if (item === this.name) {
         this.win()
-      } else if (this.state <= 1) {
-        switch (this.state) {
-          case 0:
+        return
+      }
+      this.points -= 1
+      if (this.points >= 1) {
+        switch (this.points) {
+          case 2:
             this.star1color = "#ff0000"
                 break
           case 1:
             this.star2color = "#ff0000"
                 break
         }
-        this.state += 1
         this.answers[item] = true
         await this.delay(100)
-        this.scrollToId()
+        this.scrollToCurrentSection()
       } else {
         this.star3color = "#ff0000"
         this.lose()
       }
     },
-    scrollToId() {
-      let access = document.getElementById("section" + this.state);
-      access.scrollIntoView({behavior: 'smooth'}, true);
+    scrollToCurrentSection() {
+      let access = document.getElementById("section" + this.points);
+      if (access !== null) {
+        access.scrollIntoView({behavior: 'smooth'}, true);
+      }
     },
     delay(time) {
       return new Promise(resolve => setTimeout(resolve, time));
     },
     win() {
-      window.Telegram.WebApp.showPopup(this.winPopupConfig, this.emitWinState)
+      window.Telegram.WebApp.showPopup(this.winPopupConfig, this.emitPlayedState)
     },
     lose() {
-      window.Telegram.WebApp.showPopup(this.losePopupConfig, this.emitWinState)
+      window.Telegram.WebApp.showPopup(this.losePopupConfig, this.emitPlayedState)
     },
-    emitWinState() {
-      this.$emit("emit-win")
+    emitPlayedState() {
+      this.$emit("emit-win", this.points)
     },
     shuffleArray(array) {
       for (let i = array.length - 1; i > 0; i--) {

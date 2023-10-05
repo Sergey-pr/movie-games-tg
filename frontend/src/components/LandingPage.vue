@@ -135,7 +135,6 @@ body {
 }
 
 .container {
-  //background-color: #cc7676;
   background: linear-gradient(#cc7676, #d0a67f);
   margin: 0 45px 20px;
   border-radius: 0 0 25px 25px;
@@ -163,7 +162,7 @@ body {
 
 .logo {
   margin: 30px 10px 30px 10px;
-  max-width: 18em;
+  max-width: 250px;
 }
 
 #app {

@@ -1,7 +1,7 @@
 <template>
   <LoadingComponent class="loading" v-if="!loaded"></LoadingComponent>
-  <CardPage v-if="loaded && !winState" :card="currentCard" @emit-win="win"></CardPage>
-  <CardInfoPage v-if="loaded && winState" :card="currentCard" @emit-next="next"></CardInfoPage>
+  <CardPage v-if="loaded && !playedState" :card="currentCard" @emit-win="played"></CardPage>
+  <CardInfoPage v-if="loaded && playedState" :card="currentCard" :points="points" @emit-next="next"></CardInfoPage>
 </template>
 
 <script>
@@ -16,11 +16,12 @@ export default {
   components: {CardInfoPage, LoadingComponent, CardPage},
   data() {
     return {
-      winState: false,
+      playedState: false,
       cards: [],
       currentCard: {},
       currentCardIndex: 0,
       loaded: false,
+      points: 0,
     }
   },
   mounted() {
@@ -39,16 +40,17 @@ export default {
     onClickBack() {
       this.$router.push('/')
     },
-    win() {
-      this.winState = true
+    played(points) {
+      this.points += points
+      this.playedState = true
     },
     next() {
-      this.winState = false
+      this.playedState = false
       this.currentCardIndex += 1
       if (this.currentCardIndex >= this.cards.length) {
+        // The end
         this.currentCardIndex = 0
       }
-      console.log(this.currentCardIndex)
       this.currentCard = this.cards[this.currentCardIndex]
     }
   }

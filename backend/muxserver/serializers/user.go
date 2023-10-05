@@ -9,6 +9,7 @@ type user struct {
 	TelegramId int    `json:"tg_id"`
 	Name       string `json:"name"`
 	Language   string `json:"language"`
+	Points     int    `json:"points"`
 }
 
 func User(obj *models.User) *user {

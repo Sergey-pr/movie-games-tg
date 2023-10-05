@@ -15,3 +15,8 @@ type UserForm struct {
 type UserLang struct {
 	Language string `json:"language_code" validate:"required"`
 }
+
+type UserAnswer struct {
+	CardId int `json:"card_id" validate:"required"`
+	Points int `json:"points" validate:"required"`
+}

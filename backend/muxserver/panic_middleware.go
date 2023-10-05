@@ -3,17 +3,11 @@ package muxserver
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/Sergey-pr/movie-games-tg/config"
-	"github.com/Sergey-pr/movie-games-tg/muxserver/forms"
 	"github.com/Sergey-pr/movie-games-tg/utils"
-	"io"
-	"log"
-	"net/http"
-	"runtime/debug"
-
 	"github.com/lib/pq"
+	"io"
+	"net/http"
 )
 
 func panicMiddleware(h http.Handler) http.Handler {
@@ -34,18 +28,8 @@ func panicMiddleware(h http.Handler) http.Handler {
 
 				switch t := r.(type) {
 				case *pq.Error:
-					pqError := t
-					switch pqError.Code {
-					case "23505":
-						errDetails = errors.New("value not unique")
-						errHttpCode = http.StatusConflict
-					case "P0001":
-						errDetails = errors.New("account limit")
-						errHttpCode = http.StatusPaymentRequired
-					default:
-						errDetails = fmt.Sprintf("%s : %s", pqError.Code, pqError.Message)
-						errHttpCode = http.StatusBadRequest
-					}
+					errDetails = fmt.Sprintf("%s : %s", t.Code, t.Message)
+					errHttpCode = http.StatusBadRequest
 				case utils.ValidateError:
 					errHttpCode = http.StatusBadRequest
 					errDetails = utils.ValidateErrors{t}.Error()
@@ -56,18 +40,8 @@ func panicMiddleware(h http.Handler) http.Handler {
 					errDetails = t
 				case error:
 					errDetails = t.Error()
-
 				default:
-					if config.AppConfig.Debug == true {
-						log.Println(string(debug.Stack()))
-					}
 					errDetails = "Unknown error"
-				}
-
-				var form forms.BotUpdate
-				err = json.NewDecoder(io.NopCloser(bytes.NewReader(payload))).Decode(&form)
-				if err == nil {
-					err = utils.SendBotMessage(form.Message.Chat.Id, fmt.Sprintf("%s\n\n%s", errDetails.(string), string(debug.Stack())))
 				}
 
 				w.Header().Set("Content-Type", "application/json")

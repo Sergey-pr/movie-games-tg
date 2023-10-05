@@ -34,7 +34,7 @@ type Card struct {
 	Completed        bool        `db:"completed"`
 }
 
-// GetCardById return card object by expression
+// GetCardById return card object by its id
 func GetCardById(ctx context.Context, cardId int) (*Card, error) {
 	var obj Card
 	exists, err := persist.Db.From(CardsTableName).Where(
@@ -74,7 +74,7 @@ func (obj *Card) Save(ctx context.Context) error {
 	return nil
 }
 
-// createCard private method for create new cards DB record
+// create private method to create new card DB record
 func (obj *Card) create(ctx context.Context) error {
 	insert := persist.Db.Insert(CardsTableName).
 		Rows(obj).
@@ -86,7 +86,7 @@ func (obj *Card) create(ctx context.Context) error {
 	return nil
 }
 
-// updateCard private method for update card record in DB
+// update private method to update card record in DB
 func (obj *Card) update(ctx context.Context) error {
 	update := persist.Db.From(CardsTableName).
 		Where(goqu.C("id").Eq(obj.Id)).Update().Set(obj).
@@ -98,7 +98,7 @@ func (obj *Card) update(ctx context.Context) error {
 	return nil
 }
 
-// Delete delete card from DB
+// Delete card from DB
 func (obj *Card) Delete(ctx context.Context) error {
 	_, err := persist.Db.From(CardsTableName).
 		Where(goqu.Ex{"id": obj.Id}).
