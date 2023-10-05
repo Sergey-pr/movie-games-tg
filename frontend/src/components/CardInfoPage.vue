@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <img alt="screenshot" class="screenshot" :src="imgUrlPrefix + card.screenshot_id">
+    <img id="screenshot" alt="screenshot" class="screenshot" :src="imgUrlPrefix + card.screenshot_id">
     <h2 class="name">{{ name }}</h2>
     <h3 class="name-ru">{{ name_ru }}</h3>
     <p class="desc">{{ desc }}</p>
@@ -79,6 +79,7 @@ export default {
       this.background = 'linear-gradient(45deg, ' + this.card.bg_color_1 + ', ' + this.card.bg_color_2 + ')'
       this.textColor = this.card.text_color
       this.setLanguage();
+      this.scrollToScreenshot();
     },
     setLanguage() {
       this.language = this.user.language
@@ -99,7 +100,11 @@ export default {
     },
     emitNext() {
       this.$emit("emit-next")
-    }
+    },
+    scrollToScreenshot() {
+      let access = document.getElementById("screenshot");
+      access.scrollIntoView({behavior: 'smooth'}, true);
+    },
   }
 }
 </script>
