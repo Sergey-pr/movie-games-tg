@@ -154,7 +154,7 @@ body {
 }
 
 .lang {
-  color: var(--tg-theme-text-color);
+  color: #ffffff;
   font-size: 25px;
   font-weight: bold;
   margin: 0 5px 5px;

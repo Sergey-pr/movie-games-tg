@@ -272,7 +272,7 @@ export default {
 
 .btn-answer {
   border: none;
-  color: #ffffff;
+  color: var(--tg-theme-text-color);
   font-weight: normal;
   font-size: 25px;
   margin: 10px;
