@@ -25,10 +25,10 @@ type UserData struct {
 // GetLeaderboardData return count of points per user
 func GetLeaderboardData(ctx context.Context) ([]*UserData, error) {
 	var data []*UserData
-	err := persist.Db.From(AnswersTableName).Select(goqu.I("user_id")).
-		Select(goqu.SUM(goqu.I("points")).As("total_points")).
-		GroupBy(goqu.I("user_id")).
-		Order(goqu.I("total_points").Desc()).ScanStructsContext(ctx, &data)
+	err := persist.Db.From(AnswersTableName).
+		Select(goqu.C("user_id"), goqu.SUM(goqu.I("points")).As("total_points")).
+		GroupBy(goqu.C("user_id")).
+		Order(goqu.C("total_points").Desc()).ScanStructsContext(ctx, &data)
 	if err != nil {
 		return nil, err
 	}

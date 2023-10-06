@@ -5,7 +5,8 @@ import { createRouter, createWebHistory } from "vue-router"
 import App from './App.vue'
 import PlayGame from './components/PlayGame.vue'
 import LandingPage from './components/LandingPage.vue'
-import RulesComponent from "@/components/RulesComponent.vue";
+import RulesPage from "@/components/RulesPage.vue";
+import LeaderboardPage from "@/components/LeaderboardPage.vue";
 
 import 'primevue/resources/themes/bootstrap4-light-blue/theme.css';
 import 'primevue/resources/primevue.min.css';
@@ -14,7 +15,8 @@ import 'primevue/resources/primevue.min.css';
 const routes = [
     { path: '/', component: LandingPage },
     { path: '/play', component: PlayGame },
-    { path: '/rules', component: RulesComponent },
+    { path: '/rules', component: RulesPage },
+    { path: '/leaderboard', component: LeaderboardPage },
 ]
 
 const router = createRouter({

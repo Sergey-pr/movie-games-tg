@@ -1,8 +1,7 @@
 package forms
 
 type LoginForm struct {
-	Hash string   `json:"hash" validate:"required"`
-	User UserForm `json:"user"`
+	InitData string `json:"init_data"`
 }
 
 type UserForm struct {

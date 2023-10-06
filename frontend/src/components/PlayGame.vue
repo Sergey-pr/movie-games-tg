@@ -1,22 +1,24 @@
 <template>
   <LoadingComponent class="loading" v-if="!loaded"></LoadingComponent>
-  <CardPage v-if="loaded && !playedState" :card="currentCard" @emit-win="played"></CardPage>
-  <CardInfoPage v-if="loaded && playedState" :card="currentCard" :points="points" @emit-next="next"></CardInfoPage>
+  <CardPage v-if="loaded && state === 'play'" :card="currentCard" @emit-win="played"></CardPage>
+  <CardInfoPage v-if="loaded && state === 'info'" :card="currentCard" :points="points" @emit-next="next"></CardInfoPage>
+  <TheEndPage v-if="loaded && state === 'end'" :points="points"></TheEndPage>
 </template>
 
 <script>
 
-import {useCards} from "@/services/adapter";
+import {useCards, useUsers} from "@/services/adapter";
 import CardPage from "@/components/CardPage.vue";
 import LoadingComponent from "@/components/LoadingComponent.vue";
 import CardInfoPage from "@/components/CardInfoPage.vue";
+import TheEndPage from "@/components/TheEndPage.vue";
 
 export default {
   name: 'PlayGame',
-  components: {CardInfoPage, LoadingComponent, CardPage},
+  components: {CardInfoPage, LoadingComponent, CardPage, TheEndPage},
   data() {
     return {
-      playedState: false,
+      state: "play", // 3 states "play", "info", "end"
       cards: [],
       currentCard: {},
       currentCardIndex: 0,
@@ -41,17 +43,20 @@ export default {
       this.$router.push('/')
     },
     played(points) {
+      useUsers().processAnswer(this.$store.state.jwt, points, this.currentCard.id);
       this.points += points
-      this.playedState = true
+      this.state = "info"
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     next() {
-      this.playedState = false
+      this.state = "play"
       this.currentCardIndex += 1
       if (this.currentCardIndex >= this.cards.length) {
-        // The end
-        this.currentCardIndex = 0
+        this.state = "end"
+      } else {
+        this.currentCard = this.cards[this.currentCardIndex]
       }
-      this.currentCard = this.cards[this.currentCardIndex]
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 }

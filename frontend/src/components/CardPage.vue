@@ -225,10 +225,6 @@ export default {
   box-shadow: 15px 15px 30px rgba(0, 0, 0, .3);
 }
 
-.card-block {
-  height: 325px;
-}
-
 .drawing {
   margin-top: 25px;
   max-width: 225px;
@@ -247,11 +243,10 @@ export default {
 }
 
 .pixelated {
-  height: 100%;
+  width: 100%;
 }
 
 .content-block {
-  height: 250px;
   display: block;
   align-items: center;
   justify-content: center;

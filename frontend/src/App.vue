@@ -12,11 +12,6 @@ export default {
 
   },
   methods: {
-    // checkExpanded() {
-    //   if (!window.Telegram.WebApp.isExpanded) {
-    //     window.Telegram.WebApp.expand();
-    //   }
-    // }
   }
 }
 </script>

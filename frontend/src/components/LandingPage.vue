@@ -12,16 +12,19 @@
       </div>
       <img v-if="language === 'ru'" class="logo" alt="Game logo" src="./../assets/logo_ru.png">
       <img v-if="language === 'en'" class="logo" alt="Game logo" src="./../assets/logo_en.png">
-      <h1 class="welcome-message">{{ welcomeMessage }}{{ userName }}</h1>
-      <h3 class="description">{{ description }}</h3>
+      <h1 class="welcome-message-landing">{{ welcomeMessage }}{{ userName }}</h1>
+      <h3 class="description-landing">{{ description }}</h3>
       <button class="btn-start" @click="this.onClickStart()">
         <p class="btn-start-label">{{ startLabel }}</p>
       </button>
     </div>
     <div class="block-pink">
       <img class="landing-drawing" alt="Game drawing" src="./../assets/drawing.png">
-      <button class="btn-rules" @click="this.onClickRules()">
-        <p class="btn-rules-label">{{ rulesLabel }}</p>
+      <button class="btn-landing" @click="this.onClickRules()">
+        <p class="btn-landing-label">{{ rulesLabel }}</p>
+      </button>
+      <button class="btn-landing" @click="this.onClickLeaderboard()">
+        <p class="btn-landing-label">{{ leaderboardLabel }}</p>
       </button>
     </div>
   </div>
@@ -46,6 +49,7 @@ export default {
       loaded: false,
       startLabel: "",
       rulesLabel: "",
+      leaderboardLabel: ""
     }
   },
   created() {
@@ -53,14 +57,13 @@ export default {
   },
   methods: {
     async init() {
-      let initData = window.Telegram.WebApp.initData
-      // Here we parse init data as json object, because we get it as string
-      let body = JSON.parse('{"' + initData.replace(/&/g, '","').replace(/=/g,'":"') + '"}', function(key, value) { return key===""?value:decodeURIComponent(value) });
-      // We need to parse user too
-      body.user = JSON.parse(body.user)
       // Send login request to log in and verify initData hash
-      let response = await useAuth().login(body);
-      // TODO process fake data error
+      let response = await useAuth().login(
+          {init_data: window.Telegram.WebApp.initData}
+      );
+      if (response.status !== 200) {
+        return
+      }
       // Set token to store
       this.$store.commit('setJwt', response.data["token"])
       // Get user data
@@ -69,7 +72,7 @@ export default {
       this.userName = response.data["name"]
       this.language = response.data["language"]
       this.$store.commit('setUser', response.data)
-
+      // Hide default telegram buttons
       window.Telegram.WebApp.BackButton.hide()
       window.Telegram.WebApp.MainButton.hide()
       // Set up translations
@@ -84,11 +87,13 @@ export default {
         this.description = "Давай сыграем в игру на знание известных фильмов. Здесь ты проверишь свои знания и узнаешь о новых интересных фильмах."
         this.startLabel = "СТАРТ"
         this.rulesLabel = "ПРАВИЛА"
+        this.leaderboardLabel = "ЛУЧШИЕ ИГРОКИ"
       } else {
         this.welcomeMessage = "Welcome "
         this.description = "Let's see how good is your movie knowledge. You will try to guess movie names and learn about famous movies."
         this.startLabel = "START"
         this.rulesLabel = "RULES"
+        this.leaderboardLabel = "LEADERBOARD"
       }
     },
     changeLang() {
@@ -102,8 +107,10 @@ export default {
     onClickRules() {
       this.$router.push('/rules')
     },
+    onClickLeaderboard() {
+      this.$router.push('/leaderboard')
+    },
   }
-
 }
 </script>
 
@@ -116,7 +123,7 @@ export default {
   padding: 10px;
 }
 
-.welcome-message {
+.welcome-message-landing {
   margin: 10px;
   color: #ffffff;
   background: transparent;
@@ -124,7 +131,7 @@ export default {
   font-size: 40px;
 }
 
-.description {
+.description-landing {
   margin: 10px;
   color: #999999;
 }
@@ -235,7 +242,7 @@ input:checked + .slider:before {
   color: #ffffff;
 }
 
-.btn-rules {
+.btn-landing {
   color: #ffffff;
   background-color: #433789;
   font-weight: normal;
@@ -245,10 +252,10 @@ input:checked + .slider:before {
   width: 100%;
   height: 50px;
   padding: 0;
-  margin: 0;
+  margin: 20px 0 0;
 }
 
-.btn-rules-label {
+.btn-landing-label {
   padding: 0;
   margin: 0;
 }

@@ -15,7 +15,7 @@
 import LoadingComponent from "@/components/LoadingComponent.vue";
 
 export default {
-  name: 'RulesComponent',
+  name: 'RulesPage',
   components: {
     LoadingComponent,
   },
@@ -35,6 +35,7 @@ export default {
   },
   mounted() {
     this.init();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.loaded = true
   },
   methods: {
@@ -48,7 +49,6 @@ export default {
     setLanguage() {
       this.language = this.user.language
       if (this.language === "ru") {
-        window.Telegram.WebApp.MainButton.text = "Назад"
         this.rulesLabel = "Правила"
         this.rulesLabel1 = "1 часть"
         this.rules1 = "Нужно отгадать фильм по стилистическому рисунку. "+
@@ -65,7 +65,6 @@ export default {
             "За угаданный фильм по стилизованному кадру участник получает 1 балла. И он может перейти на другую карточку. " +
             "Если фильм не угадан, то участник может перевернуть карточку и посмотреть ответ."
       } else {
-        window.Telegram.WebApp.MainButton.text = "Back"
         this.rulesLabel = "Rules"
         this.rulesLabel1 = "Part 1"
         this.rules1 = "You need to guess the film based on its stylistic drawing. "+

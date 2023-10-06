@@ -5,19 +5,9 @@ const urls = {
     cards: 'api/cards/',
     userInfo: 'api/user/',
     userChangeLang: 'api/user/lang/',
-    cardImageUrl: 'api/public/bot-image/'
-}
-
-export function createDynamicString(string, replaceParams) {
-    let result = string;
-    if (typeof replaceParams === 'object') {
-        for (const dynamicKey in replaceParams) {
-            result = result.replaceAll(dynamicKey, replaceParams[dynamicKey]);
-        }
-    } else {
-        replaceParams.forEach((dynamicValue, index) => result = result.replaceAll(`[${index}]`, dynamicValue));
-    }
-    return result;
+    cardImageUrl: 'api/public/bot-image/',
+    processAnswer: 'api/user/answer/',
+    leaderboard: `api/leaderboard/`
 }
 
 export function useAuth() {
@@ -58,6 +48,22 @@ export function useUsers() {
                 }
             }
             return axiosInstance().post(urls.userChangeLang, {"language_code": lang}, config);
+        },
+        processAnswer(jwt, points, cardId) {
+            let config = {
+                headers: {
+                    jwt: jwt
+                }
+            }
+            return axiosInstance().post(urls.processAnswer, {"points": points, card_id: cardId}, config);
+        },
+        getLeaderboards(jwt) {
+            let config = {
+                headers: {
+                    jwt: jwt
+                }
+            }
+            return axiosInstance().get(urls.leaderboard, config);
         }
     }
 }
