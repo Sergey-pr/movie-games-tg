@@ -15,7 +15,7 @@
       <h1 class="welcome-message-landing">{{ welcomeMessage }}{{ userName }}</h1>
       <h3 class="description-landing">{{ description }}</h3>
       <button class="btn-start" @click="this.onClickStart()">
-        <p class="btn-start-label">{{ startLabel }}</p>
+        <img class="play-image" alt="Play button" src="./../assets/play.png">
       </button>
     </div>
     <div class="block-pink">
@@ -47,7 +47,6 @@ export default {
       userName: "",
       language: "en",
       loaded: false,
-      startLabel: "",
       rulesLabel: "",
       leaderboardLabel: ""
     }
@@ -85,13 +84,11 @@ export default {
       if (this.language === "ru") {
         this.welcomeMessage = "Привет "
         this.description = "Давай сыграем в игру на знание известных фильмов. Здесь ты проверишь свои знания и узнаешь о новых интересных фильмах."
-        this.startLabel = "СТАРТ"
         this.rulesLabel = "ПРАВИЛА"
         this.leaderboardLabel = "ЛУЧШИЕ ИГРОКИ"
       } else {
         this.welcomeMessage = "Welcome "
         this.description = "Let's see how good is your movie knowledge. You will try to guess movie names and learn about famous movies."
-        this.startLabel = "START"
         this.rulesLabel = "RULES"
         this.leaderboardLabel = "LEADERBOARD"
       }
@@ -142,7 +139,7 @@ body {
 }
 
 .container {
-  background: linear-gradient(#cc7676, #d0a67f);
+  background: linear-gradient(#da6666, #d0a67f);
   margin: 0 45px 20px;
   border-radius: 0 0 25px 25px;
   box-shadow: 15px 15px 30px rgba(0, 0, 0, .3);
@@ -236,12 +233,6 @@ input:checked + .slider:before {
   border: none;
 }
 
-.btn-start-label {
-  font-weight: bold;
-  font-size: 40px;
-  color: #ffffff;
-}
-
 .btn-landing {
   color: #ffffff;
   background-color: #433789;
@@ -263,6 +254,11 @@ input:checked + .slider:before {
 .landing-drawing {
   max-width: 225px;
   max-height: 225px;
+}
+
+.play-image {
+  max-width: 90px;
+  max-height: 90px;
 }
 
 .block-pink {

@@ -143,7 +143,7 @@ h1 {
   font-weight: normal;
   font-size: 18px;
   margin: 15px;
-  text-align: justify;
+  text-align: start;
 }
 
 .facts-label {
@@ -153,7 +153,7 @@ h1 {
 }
 
 .fact {
-  text-align: justify;
+  text-align: start;
   color: v-bind(textColor);
   font-weight: normal;
   font-size: 18px;

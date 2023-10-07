@@ -1,12 +1,12 @@
 <template>
   <LoadingComponent class="loading" v-if="!loaded"></LoadingComponent>
-  <div class="container" v-if="loaded">
+  <div class="end-game-container" v-if="loaded">
     <div class="top-card">
       <h1 class="welcome-message">{{ youWinLabel }}<br>{{ user.name }}</h1>
       <h3 class="description">{{ youWinText }}</h3>
     </div>
     <div class="block-pink">
-      <img class="landing-drawing" alt="Game drawing" src="./../assets/drawing.png">
+      <img class="landing-drawing" alt="Game drawing" src="./../assets/end_drawing.png">
     </div>
   </div>
 </template>
@@ -104,8 +104,8 @@ body {
   margin: 0;
 }
 
-.container {
-  background: linear-gradient(#cc7676, #d0a67f);
+.end-game-container {
+  background: linear-gradient(#cc7676, #8b60a8);
   margin: 0 45px 20px;
   border-radius: 0 0 25px 25px;
   box-shadow: 15px 15px 30px rgba(0, 0, 0, .3);

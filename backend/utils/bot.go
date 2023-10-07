@@ -39,7 +39,7 @@ func SendStartBotMessage(chatId int, text string, buttonText string) error {
 		ReplyMarkup: &replyMarkup{InlineKeyboard: [][]*keyboardButton{{
 			&keyboardButton{
 				Text:   buttonText,
-				WebApp: &webAppInfo{Url: "https://t.me/tg_mini_app_debug_bot/MovieGames"},
+				WebApp: &webAppInfo{Url: config.AppConfig.FrontendHostname},
 			},
 		}}},
 		ParseMode: "MarkdownV2",
@@ -123,7 +123,7 @@ func DownloadBotImage(imageId string) error {
 func RegisterCallback() error {
 	endpoint := fmt.Sprintf("https://api.telegram.org/bot%s/setWebhook", config.AppConfig.TelegramBotToken)
 	body := map[string]string{
-		"url": fmt.Sprintf("%s/api/public/bot-updates/", config.AppConfig.Hostname),
+		"url": fmt.Sprintf("%s/api/public/bot-updates/", config.AppConfig.BackendHostname),
 	}
 
 	jsonValue, _ := json.Marshal(body)

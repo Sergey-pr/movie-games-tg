@@ -27,7 +27,8 @@ type config struct {
 
 	TelegramBotToken string `envconfig:"TELEGRAM_BOT_TOKEN" required:"true"`
 
-	Hostname string `envconfig:"HOSTNAME" required:"true"`
+	FrontendHostname string `envconfig:"FRONTEND_HOSTNAME" required:"true"`
+	BackendHostname  string `envconfig:"BACKEND_HOSTNAME" required:"true"`
 }
 
 func getConfig() *config {
