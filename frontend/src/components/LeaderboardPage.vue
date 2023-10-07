@@ -1,7 +1,8 @@
 <template>
   <LoadingComponent class="loading" v-if="!loaded"></LoadingComponent>
   <div class="leaderboard-card" v-if="loaded">
-    <h1 id="leaderboard-label">{{ leaderboardLabel }}</h1>
+    <p class="leaderboard-desc">{{ desc }}</p>
+    <p class="leaderboard-label">{{ leaderboardLabel }}</p>
     <p class="leaderboard-text" :key="index" v-for="(data, index) in usersData">
       {{ data.name }}:&nbsp;{{ data.points }}
     </p>
@@ -10,7 +11,7 @@
 
 <script>
 import LoadingComponent from "@/components/LoadingComponent.vue";
-import {useUsers} from "@/services/adapter";
+import {privateApi} from "@/services/api";
 
 export default {
   name: 'LeaderboardPage',
@@ -19,11 +20,10 @@ export default {
   },
   data() {
     return {
-      user: {},
-      language: "en",
       loaded: false,
       usersData: [],
       leaderboardLabel: "",
+      desc: ""
     }
   },
   mounted() {
@@ -33,21 +33,29 @@ export default {
   },
   methods: {
     async init() {
-      this.user = this.$store.state.user
       window.Telegram.WebApp.BackButton.show()
       window.Telegram.WebApp.onEvent('backButtonClicked', this.onClickBack)
       window.Telegram.WebApp.MainButton.hide()
-      let response = await useUsers().getLeaderboards(this.$store.state.jwt);
+      let response = await privateApi().getLeaderboards(this.$store.state.jwt);
+      if (response.status !== 200) {
+        this.loaded = false
+      }
       this.usersData = response.data
       this.setLanguage();
     },
+    // Sets translation
     setLanguage() {
-      this.language = this.user.language
-      if (this.language === "ru") {
+      if (this.$store.state.user.language === "ru") {
         this.leaderboardLabel = "Лучшие Игроки"
-             } else {
-        this.leaderboardLabel = "High Scores"}
+        this.desc = "В лучший счёт засчитывается только первый ответ на карточку, " +
+            "чтобы нельзя было сразу переиграть и на всё ответить правильно."
+      } else {
+        this.leaderboardLabel = "High Scores"
+        this.desc = "To the high scores goes only your first answer to card. " +
+            "It is done to prevent learning all the answers for perfect points."
+      }
     },
+    // Returns to the landing page
     onClickBack() {
       this.$router.push('/')
     },
@@ -57,6 +65,11 @@ export default {
 </script>
 
 <style>
+
+body {
+  background-color: var(--tg-theme-bg-color);
+}
+
 .loading {
   position: absolute;
   top: 50%;
@@ -65,19 +78,25 @@ export default {
   padding: 10px;
 }
 
+.leaderboard-desc {
+  color: #ffffff;
+  font-weight: normal;
+  font-size: 18px;
+  margin: 15px;
+  text-align: center;
+}
+
 .leaderboard-text {
   margin: 10px;
   color: white;
 }
 
-#leaderboard-label {
-  margin: 10px;
-  color: white;
-  background: transparent;
-}
-
-body {
-  background-color: var(--tg-theme-bg-color);
+.leaderboard-label {
+  color: #ffffff;
+  background-color: #433789;
+  font-weight: normal;
+  font-size: 26px;
+  padding: 10px;
 }
 
 .leaderboard-card {

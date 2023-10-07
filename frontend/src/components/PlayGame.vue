@@ -1,13 +1,15 @@
 <template>
   <LoadingComponent class="loading" v-if="!loaded"></LoadingComponent>
-  <CardPage v-if="loaded && state === 'play'" :card="currentCard" @emit-win="played"></CardPage>
-  <CardInfoPage v-if="loaded && state === 'info'" :card="currentCard" :points="points" @emit-next="next"></CardInfoPage>
+  <CardPage v-if="loaded && state === 'play'" :card="currentCard" @emit-win="cardPlayedCallback"></CardPage>
+  <CardInfoPage v-if="loaded && state === 'info'" :card="currentCard" :points="points" @emit-next="infoPlayedCallback"></CardInfoPage>
   <TheEndPage v-if="loaded && state === 'end'" :points="points"></TheEndPage>
+  <p class="cards-counter" v-if="state !== 'end'">{{ cardText }}: {{ currentCardIndex + 1}}/{{cards.length}}</p>
 </template>
 
 <script>
 
-import {useCards, useUsers} from "@/services/adapter";
+import {privateApi} from "@/services/api";
+import { shuffleArray } from "@/services/utils";
 import CardPage from "@/components/CardPage.vue";
 import LoadingComponent from "@/components/LoadingComponent.vue";
 import CardInfoPage from "@/components/CardInfoPage.vue";
@@ -24,6 +26,7 @@ export default {
       currentCardIndex: 0,
       loaded: false,
       points: 0,
+      cardText: "Card"
     }
   },
   mounted() {
@@ -31,25 +34,44 @@ export default {
   },
   methods: {
     async init() {
+      // Enable back button at the top of the screen
       window.Telegram.WebApp.onEvent('backButtonClicked', this.onClickBack)
       window.Telegram.WebApp.BackButton.show()
-
-      let response = await useCards().cardsList(this.$store.state.jwt);
+      // Get all cards objects
+      let response = await privateApi().getCards(this.$store.state.jwt);
+      if (response.status !== 200) {
+        this.loaded = false
+      }
       this.cards = response.data
-      this.shuffleArray(this.cards)
+      // Shuffle cards
+      shuffleArray(this.cards)
+      // Set current card
       this.currentCard = this.cards[this.currentCardIndex]
+      this.setLanguage()
       this.loaded = true;
     },
+    // Sets translation
+    setLanguage() {
+      if (this.$store.state.user.language === "ru") {
+        this.cardText = "Карта"
+      }
+    },
+    // Returns to the landing page
     onClickBack() {
       this.$router.push('/')
     },
-    played(points) {
-      useUsers().processAnswer(this.$store.state.jwt, points, this.currentCard.id);
+    // Sends points to backend to save result in the database, adds points, and changes state
+    async cardPlayedCallback(points) {
+      let response = await privateApi().processAnswer(this.$store.state.jwt, points, this.currentCard.id);
+      if (response.status !== 200) {
+        this.loaded = false
+      }
       this.points += points
       this.state = "info"
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-    next() {
+    // Changes state to play or end if there are no more cards
+    infoPlayedCallback() {
       this.state = "play"
       this.currentCardIndex += 1
       if (this.currentCardIndex >= this.cards.length) {
@@ -58,13 +80,7 @@ export default {
         this.currentCard = this.cards[this.currentCardIndex]
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-    shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    },
+    }
   }
 }
 </script>
@@ -76,5 +92,9 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   padding: 10px;
+}
+
+.cards-counter {
+  color: #565473;
 }
 </style>

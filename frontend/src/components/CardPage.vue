@@ -39,6 +39,8 @@
 
 <script>
 
+import { shuffleArray } from "@/services/utils";
+
 export default {
   name: 'CardPage',
   components: {},
@@ -51,6 +53,7 @@ export default {
       }
     }
   },
+  // Wait until props are given to component before init page
   watch: {
     $props: {
       handler(newVal) {
@@ -66,9 +69,9 @@ export default {
     return {
       background: "",
       language: "en",
-      drawingTitle: "3 points",
-      quoteTitle: "2 points",
-      pixelatedTitle: "1 point",
+      drawingTitle: "GUESS BY DRAWING",
+      quoteTitle: "GUESS BY QUOTE",
+      pixelatedTitle: "GUESS BY FRAME",
       user: {},
       loaded: false,
       quote: "",
@@ -84,21 +87,23 @@ export default {
     }
   },
   created() {
+    // Set image urls prefix for dev/prod
     if (process.env.VUE_APP_BASE_URL !== undefined) {
       this.imgUrlPrefix = process.env.VUE_APP_BASE_URL + "/api/public/bot-image/";
     } else {
       this.imgUrlPrefix = "/api/public/bot-image/";
     }
   },
-  mounted() {
-  },
   methods: {
     async init() {
       this.user = this.$store.state.user
+      // Hide main telegram button at the bottom
       window.Telegram.WebApp.MainButton.hide()
+      // Set dynamic background for card
       this.background = 'linear-gradient(45deg, ' + this.card.bg_color_1 + ', ' + this.card.bg_color_2 + ')'
       this.setLanguage();
     },
+    // Sets translation
     setLanguage() {
       this.language = this.user.language
       if (this.language === "ru") {
@@ -106,24 +111,33 @@ export default {
           case "movie":
             this.category = "Фильм"
         }
-        this.shuffleArray(this.card.answers_ru)
+        // Shuffle answers so the order would be different every playthrough
+        shuffleArray(this.card.answers_ru)
+        // Set false to all the answers, if the answer is chosen we set this answer to true
         this.card.answers_ru.forEach((element) => {
           this.answers[element] = false
         })
         this.name = this.card.name_ru
         this.quote = this.card.quote_ru
-        this.drawingTitle = "3 балла"
-        this.quoteTitle = "2 балла"
-        this.pixelatedTitle = "1 балл"
+        this.drawingTitle = "УГАДАЙ ПО РИСУНКУ"
+        this.quoteTitle = "УГАДАЙ ПО ЦИТАТЕ"
+        this.pixelatedTitle = "УГАДАЙ ПО КАДРУ"
+        // Set telegram popup config to use with window.Telegram.WebApp.showPopup
+        let pointsText = "балл"
+        if (this.points > 1) {
+          pointsText = "балла"
+        }
         this.winPopupConfig = {
           title: "Верно",
-          message: "Вы правильно угадали название:\n" + this.name,
+          message: "Вы правильно угадали название:\n" + this.name +
+              "\nВы заработали " + this.points + " " + pointsText,
           buttons: [
             {
               text: "Дальше"
             }
           ]
         }
+        // Set telegram popup config to use with window.Telegram.WebApp.showPopup
         this.losePopupConfig = {
           title: "Неверно",
           message: "Правильный ответ:\n" + this.name,
@@ -138,21 +152,26 @@ export default {
           case "movie":
             this.category = "Movie"
         }
-        this.shuffleArray(this.card.answers_en)
+        // Shuffle answers so the order would be different every playthrough
+        shuffleArray(this.card.answers_en)
+        // Set false to all the answers, if the answer is chosen we set this answer to true
         this.card.answers_en.forEach((element) => {
           this.answers[element] = false
         })
         this.name = this.card.name_en
         this.quote = this.card.quote_en
+        // Set telegram popup config to use with window.Telegram.WebApp.showPopup
         this.winPopupConfig = {
           title: "Correct",
-          message: "You answered correctly, movie name is:\n" + this.name,
+          message: "You answered correctly, movie name is:\n" + this.name +
+              "\nYou've earned " + this.points + " points",
           buttons: [
             {
               text: "Next"
             }
           ]
         }
+        // Set telegram popup config to use with window.Telegram.WebApp.showPopup
         this.losePopupConfig = {
           title: "Wrong",
           message: "The correct answer is:\n" + this.name,
@@ -165,12 +184,17 @@ export default {
       }
     },
     async processAnswer(item) {
+      // If answer is correct we win
       if (item === this.name) {
         this.win()
         return
       }
       this.points -= 1
+      // If there are 1 or more points we lose points
+      // else we lose
       if (this.points >= 1) {
+        // If answer is not correct we lose 1 point
+        // and set current point star color to red
         switch (this.points) {
           case 2:
             this.star1color = "#ff0000"
@@ -179,8 +203,10 @@ export default {
             this.star2color = "#ff0000"
                 break
         }
+        // Set this answer value to true
         this.answers[item] = true
         await this.delay(100)
+        // Scroll to the new hint
         this.scrollToCurrentSection()
       } else {
         this.star3color = "#ff0000"
@@ -188,6 +214,7 @@ export default {
       }
     },
     scrollToCurrentSection() {
+      // Get section by our point
       let access = document.getElementById("section" + this.points);
       if (access !== null) {
         access.scrollIntoView({behavior: 'smooth'}, true);
@@ -202,14 +229,9 @@ export default {
     lose() {
       window.Telegram.WebApp.showPopup(this.losePopupConfig, this.emitPlayedState)
     },
+    // Emits action to go to show card info in the PlayGame component
     emitPlayedState() {
       this.$emit("emit-win", this.points)
-    },
-    shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
     },
   }
 }

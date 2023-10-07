@@ -8,10 +8,7 @@ import LandingPage from './components/LandingPage.vue'
 import RulesPage from "@/components/RulesPage.vue";
 import LeaderboardPage from "@/components/LeaderboardPage.vue";
 
-import 'primevue/resources/themes/bootstrap4-light-blue/theme.css';
-import 'primevue/resources/primevue.min.css';
-
-
+// Set our SPA routes
 const routes = [
     { path: '/', component: LandingPage },
     { path: '/play', component: PlayGame },
@@ -19,11 +16,13 @@ const routes = [
     { path: '/leaderboard', component: LeaderboardPage },
 ]
 
+// Config router with web history
 const router = createRouter({
     history: createWebHistory(),
     routes,
 })
 
+// Create vuex store
 const store = createStore({
     state () {
         return {

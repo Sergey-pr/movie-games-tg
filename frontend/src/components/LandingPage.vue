@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import {useAuth, useUsers} from "@/services/adapter";
+import {publicApi, privateApi} from "@/services/api";
 import LoadingComponent from "@/components/LoadingComponent.vue";
 
 export default {
@@ -57,7 +57,7 @@ export default {
   methods: {
     async init() {
       // Send login request to log in and verify initData hash
-      let response = await useAuth().login(
+      let response = await publicApi().login(
           {init_data: window.Telegram.WebApp.initData}
       );
       if (response.status !== 200) {
@@ -66,7 +66,7 @@ export default {
       // Set token to store
       this.$store.commit('setJwt', response.data["token"])
       // Get user data
-      response = await useUsers().user(response.data["token"]);
+      response = await privateApi().getUser(response.data["token"]);
       this.user = response.data
       this.userName = response.data["name"]
       this.language = response.data["language"]
@@ -80,6 +80,7 @@ export default {
       await window.Telegram.WebApp.ready()
       this.loaded = true;
     },
+    // Sets translation
     setLanguage() {
       if (this.language === "ru") {
         this.welcomeMessage = "Привет "
@@ -93,10 +94,13 @@ export default {
         this.leaderboardLabel = "LEADERBOARD"
       }
     },
-    changeLang() {
+    async changeLang() {
       this.setLanguage();
       this.$store.commit('setLang', this.language)
-      useUsers().changeLang(this.$store.state.jwt, this.language)
+      let response = await privateApi().changeUserLang(this.$store.state.jwt, this.language)
+      if (response.status !== 200) {
+        this.loaded = false
+      }
     },
     onClickStart() {
       this.$router.push('/play')

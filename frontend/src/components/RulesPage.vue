@@ -46,12 +46,13 @@ export default {
       window.Telegram.WebApp.MainButton.hide()
       this.setLanguage();
     },
+    // Sets translation
     setLanguage() {
       this.language = this.user.language
       if (this.language === "ru") {
         this.rulesLabel = "Правила"
         this.rulesLabel1 = "1 часть"
-        this.rules1 = "Нужно отгадать фильм по стилистическому рисунку. "+
+        this.rules1 = "Нужно отгадать фильм по стилистическому рисунку. " +
             "Это может быть ключевой предмет сюжета, персонаж, пейзаж или даже природное явление. " +
             "За угаданный фильм по рисунку участник получает 3 балла." +
             "И он может взять другую карточку. " +
@@ -67,7 +68,7 @@ export default {
       } else {
         this.rulesLabel = "Rules"
         this.rulesLabel1 = "Part 1"
-        this.rules1 = "You need to guess the film based on its stylistic drawing. "+
+        this.rules1 = "You need to guess the film based on its stylistic drawing. " +
             "This could be a key plot object, a character, a landscape, or even a natural phenomenon. " +
             "For guessing the film based on the picture, the participant receives 3 points." +
             "And he can take another card. " +
@@ -82,6 +83,7 @@ export default {
             "If the movie is not guessed correctly, the participant can turn over the card and see the answer."
       }
     },
+    // Returns to the landing page
     onClickBack() {
       this.$router.push('/')
     },
@@ -91,6 +93,10 @@ export default {
 </script>
 
 <style>
+body {
+  background-color: var(--tg-theme-bg-color);
+}
+
 .loading {
   position: absolute;
   top: 50%;
@@ -116,10 +122,6 @@ export default {
   padding-bottom: 5px;
   color: white;
   background-color: #433789;
-}
-
-body {
-  background-color: var(--tg-theme-bg-color);
 }
 
 .rules-card {

@@ -36,6 +36,7 @@ export default {
     },
     points: Number
   },
+  // Wait until props are given to component before init page
   watch: {
     $props: {
       handler(newVal) {
@@ -51,10 +52,8 @@ export default {
     return {
       background: "",
       factsLabel: "INTERESTING FACTS",
-      language: "en",
       imgUrlPrefix: "",
       textColor: "",
-      user: {},
       facts: [],
       loaded: false,
       name: "",
@@ -65,26 +64,24 @@ export default {
     }
   },
   created() {
+    // Set image urls prefix for dev/prod
     if (process.env.VUE_APP_BASE_URL !== undefined) {
       this.imgUrlPrefix = process.env.VUE_APP_BASE_URL + "/api/public/bot-image/";
     } else {
       this.imgUrlPrefix = "/api/public/bot-image/";
     }
   },
-  mounted() {
-  },
   methods: {
     async init() {
-      this.user = this.$store.state.user
       window.Telegram.WebApp.onEvent('mainButtonClicked', this.emitNext)
       window.Telegram.WebApp.MainButton.show()
       this.background = 'linear-gradient(45deg, ' + this.card.bg_color_1 + ', ' + this.card.bg_color_2 + ')'
       this.textColor = this.card.text_color
       this.setLanguage();
     },
+    // Sets translation
     setLanguage() {
-      this.language = this.user.language
-      if (this.language === "ru") {
+      if (this.$store.state.user.language === "ru") {
         window.Telegram.WebApp.MainButton.text = "Дальше"
         this.factsLabel = "ИНТЕРЕСНЫЕ ФАКТЫ"
         this.pointsText = "БАЛЛЫ"
@@ -99,6 +96,7 @@ export default {
         this.facts = this.card.facts_en
       }
     },
+    // Emits action to go to the next card in the PlayGame component
     emitNext() {
       this.$emit("emit-next")
     },
@@ -107,6 +105,13 @@ export default {
 </script>
 
 <style>
+
+body {
+  scroll-behavior: smooth;
+}
+hr {
+  border: 1px solid #433789;
+}
 
 h1 {
   color: var(--tg-theme-text-color);
@@ -158,13 +163,6 @@ h1 {
   font-weight: normal;
   font-size: 18px;
   margin: 15px;
-}
-
-body {
-  scroll-behavior: smooth;
-}
-hr {
-  border: 1px solid #433789;
 }
 
 .stars-block {
