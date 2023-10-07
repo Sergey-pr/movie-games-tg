@@ -28,20 +28,20 @@ func BotUpdates(w http.ResponseWriter, r *http.Request) {
 		OrPanic(user.Save(ctx))
 	}
 
-	if !user.IsAdmin {
-		var msg string
-		if user.Language == "ru" {
-			msg = "Эта команда только для админов"
-		} else {
-			msg = "This command is only for admins"
-		}
-		OrPanic(utils.SendBotMessage(form.Message.Chat.Id, msg))
+	if user.IsAdmin {
+		processor := ObjOrPanic(user.GetBotProcessor(ctx, form.Message.Chat.Id))
+		OrPanic(processor.ProcessMsg(ctx, &form))
 		Ok(w)
 		return
 	}
 
-	processor := ObjOrPanic(user.GetBotProcessor(ctx, form.Message.Chat.Id))
-	OrPanic(processor.ProcessMsg(ctx, &form))
+	var textMsg string
+	if user.Language == "ru" {
+		textMsg = "*КИНОИГРЫ*🍿\n\nЧтобы начать игру нажмите Start\\!"
+	} else {
+		textMsg = "*MOVIEGAMES*🍿\n\nPress start to begin\\!"
+	}
+	OrPanic(utils.SendStartBotMessage(form.Message.Chat.Id, textMsg, "Start!"))
 
 	Ok(w)
 }

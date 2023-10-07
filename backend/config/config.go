@@ -26,6 +26,8 @@ type config struct {
 	MaxOpenConns int    `envconfig:"DATABASE_OPEN_IDLE_CONNS" default:"10"`
 
 	TelegramBotToken string `envconfig:"TELEGRAM_BOT_TOKEN" required:"true"`
+
+	Hostname string `envconfig:"HOSTNAME" required:"true"`
 }
 
 func getConfig() *config {

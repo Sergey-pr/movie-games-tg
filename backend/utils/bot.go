@@ -12,8 +12,45 @@ import (
 )
 
 type BotMessage struct {
-	ChatId int    `json:"chat_id"`
-	Text   string `json:"text"`
+	ChatId      int          `json:"chat_id"`
+	Text        string       `json:"text"`
+	ReplyMarkup *replyMarkup `json:"reply_markup"`
+	ParseMode   string       `json:"parse_mode"`
+}
+
+type replyMarkup struct {
+	InlineKeyboard [][]*keyboardButton `json:"inline_keyboard"`
+}
+
+type keyboardButton struct {
+	Text   string      `json:"text"`
+	WebApp *webAppInfo `json:"web_app"`
+}
+
+type webAppInfo struct {
+	Url string `json:"url"`
+}
+
+func SendStartBotMessage(chatId int, text string, buttonText string) error {
+	endpoint := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", config.AppConfig.TelegramBotToken)
+	body := BotMessage{
+		ChatId: chatId,
+		Text:   text,
+		ReplyMarkup: &replyMarkup{InlineKeyboard: [][]*keyboardButton{{
+			&keyboardButton{
+				Text:   buttonText,
+				WebApp: &webAppInfo{Url: "https://t.me/tg_mini_app_debug_bot/MovieGames"},
+			},
+		}}},
+		ParseMode: "MarkdownV2",
+	}
+
+	jsonValue, _ := json.Marshal(body)
+	_, err := http.Post(endpoint, "application/json", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func SendBotMessage(chatId int, text string) error {
@@ -80,5 +117,19 @@ func DownloadBotImage(imageId string) error {
 		return err
 	}
 
+	return nil
+}
+
+func RegisterCallback() error {
+	endpoint := fmt.Sprintf("https://api.telegram.org/bot%s/setWebhook", config.AppConfig.TelegramBotToken)
+	body := map[string]string{
+		"url": fmt.Sprintf("%s/api/public/bot-updates/", config.AppConfig.Hostname),
+	}
+
+	jsonValue, _ := json.Marshal(body)
+	_, err := http.Post(endpoint, "application/json", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		return err
+	}
 	return nil
 }
