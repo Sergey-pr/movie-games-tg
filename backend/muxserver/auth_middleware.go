@@ -22,7 +22,7 @@ func authMiddleware(next http.Handler) http.Handler {
 		jwtToken := r.Header.Get(jwt.TokenKey)
 		if len(jwtToken) > 0 {
 			// If token expired get new token
-			newTknStr, _, err := jwt.RenewJwtToken(jwtToken)
+			newTknStr, err := jwt.RenewJwtToken(jwtToken)
 			if err != nil {
 				panic(err)
 			}
