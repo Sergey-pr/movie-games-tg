@@ -3,41 +3,26 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/Sergey-pr/movie-games-tg/models"
-	"github.com/Sergey-pr/movie-games-tg/utils"
-	"github.com/gorilla/mux"
 	"net/http"
 )
 
+// OrPanic is a shortcut to panic
 func OrPanic(err error) {
 	if err != nil {
 		panic(err)
 	}
 }
 
+// ObjOrPanic is a shortcut to panic
 func ObjOrPanic[T any](o T, err error) T {
 	if err != nil {
 		panic(err)
 	}
 	return o
 }
-func DecodeRequest(r *http.Request, i interface{}) error {
-	return json.NewDecoder(r.Body).Decode(i)
-}
 
-func ValidateForm(r *http.Request, i interface{}) error {
-	if err := DecodeRequest(r, i); err != nil {
-		return err
-	}
-
-	v := utils.NewValidator()
-	errList := utils.ValidateStruct(v, i)
-	if errList != nil {
-		return errList
-	}
-	return nil
-}
-
-func Resp(w http.ResponseWriter, i interface{}, statusCode ...int) {
+// JsonResponse is a shortcut to response data from serialized struct
+func JsonResponse(w http.ResponseWriter, i interface{}, statusCode ...int) {
 	var status = http.StatusOK
 	if len(statusCode) > 0 {
 		status = statusCode[0]
@@ -49,22 +34,12 @@ func Resp(w http.ResponseWriter, i interface{}, statusCode ...int) {
 	}
 }
 
+// GetUser is a shortcut to get user from context
 func GetUser(r *http.Request) *models.User {
 	return r.Context().Value(models.UserContextKey).(*models.User)
 }
 
-func GetMuxParam(r *http.Request, key string) string {
-	return mux.Vars(r)[key]
-}
-
-func GetId(r *http.Request) int {
-	return utils.ParseInt(GetMuxParam(r, "id"))
-}
-
-func GetImageId(r *http.Request) string {
-	return GetMuxParam(r, "image_id")
-}
-
-func Ok(w http.ResponseWriter) {
-	Resp(w, map[string]string{"status": "Ok"})
+// CompletedResponse is a shortcut to completed response
+func CompletedResponse(w http.ResponseWriter) {
+	JsonResponse(w, map[string]string{"status": "completed"})
 }

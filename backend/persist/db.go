@@ -9,19 +9,17 @@ import (
 	"log"
 )
 
+// Db is a db connection variable
 var Db = connectPostgresql()
 
-func connectPostgresql(dns ...string) *goqu.Database {
-	if len(dns) == 0 {
-		dns = append(dns, config.AppConfig.Dns)
-	}
-
+// connectPostgresql returns a db connection variable
+func connectPostgresql() *goqu.Database {
+	// Set db dialect
 	dialect := goqu.Dialect("postgres")
-
-	pgDb, err := sql.Open("postgres", dns[0])
+	// Set db driver and connection by dsn string
+	pgDb, err := sql.Open("postgres", config.AppConfig.DatabaseDns)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	return dialect.DB(pgDb)
 }

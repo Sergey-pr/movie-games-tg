@@ -6,9 +6,9 @@ import (
 	"net/http"
 )
 
+// Leaderboard returning list of players with the highest scores
 func Leaderboard(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	data := ObjOrPanic(models.GetLeaderboardData(ctx))
-
-	Resp(w, ObjOrPanic(serializers.Leaderboards(ctx, data)))
+	JsonResponse(w, ObjOrPanic(serializers.Leaderboards(ctx, data)))
 }

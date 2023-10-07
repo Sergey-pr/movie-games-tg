@@ -16,25 +16,25 @@ import (
 	"strings"
 )
 
-// Login user by email and password
+// Login user or create new user by telegram init data
 func Login(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-
+	// Fill form struct with data from request and validate it
 	var form forms.LoginForm
-	OrPanic(ValidateForm(r, &form))
-	query := ObjOrPanic(url.ParseQuery(form.InitData))
-
-	print(query)
-
-	if !checkHash(query) {
-		Resp(w, nil, http.StatusForbidden)
+	OrPanic(json.NewDecoder(r.Body).Decode(&form))
+	// Parse initData which is formatted as query params
+	initData := ObjOrPanic(url.ParseQuery(form.InitData))
+	// Check hash to validate telegram data
+	if !checkHash(initData) {
+		JsonResponse(w, nil, http.StatusForbidden)
 	}
-
+	// Unmarshal user data from initData to form
 	var userForm forms.UserForm
-	OrPanic(json.Unmarshal([]byte(query.Get("user")), &userForm))
-
+	OrPanic(json.Unmarshal([]byte(initData.Get("user")), &userForm))
+	// Check if user exist
 	user, err := models.LoginUser(ctx, userForm.TelegramId)
 	if err != nil {
+		// Create new user
 		user = &models.User{
 			TelegramId: userForm.TelegramId,
 			Name:       userForm.Name,
@@ -43,33 +43,29 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 		OrPanic(user.Save(ctx))
 	}
-
-	token, expirationTime, err := user.GetJwtToken()
-	OrPanic(err)
-
-	Resp(w, serializers.JwtToken{
-		Token:   token,
-		ExpTime: expirationTime.Unix(),
-	})
+	// Return jwt token
+	JsonResponse(w, serializers.JwtToken{Token: ObjOrPanic(user.GetJwtToken())})
 }
 
-func checkHash(query url.Values) bool {
-	hash := query.Get("hash")
+// Checking hash by telegram hash algorithm
+func checkHash(initData url.Values) bool {
+	hash := initData.Get("hash")
 	checkData := make([]string, 0)
-	for key, value := range query {
-		switch key {
-		case "hash":
+	// Remove hash from init data and format as a key=value strings slice
+	for key, value := range initData {
+		if key == "hash" {
 			continue
-		default:
-			checkData = append(checkData, fmt.Sprintf("%s=%s", key, value[0]))
 		}
+		checkData = append(checkData, fmt.Sprintf("%s=%s", key, value[0]))
 	}
+	// Sort strings alphabetically
 	sort.Strings(checkData)
-	dataCheckString := strings.Join(checkData, "\n")
-
+	// Make secret string from bot token
 	secretHmac := hmac.New(sha256.New, []byte("WebAppData"))
 	secretHmac.Write([]byte(config.AppConfig.TelegramBotToken))
-
+	// Create dataCheckString by joining all alphabetically sorted key=value with \n
+	dataCheckString := strings.Join(checkData, "\n")
+	// Getting string hash and comparing it with initData hash
 	h := hmac.New(sha256.New, secretHmac.Sum(nil))
 	h.Write([]byte(dataCheckString))
 	dataHash := hex.EncodeToString(h.Sum(nil))

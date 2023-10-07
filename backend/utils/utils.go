@@ -4,10 +4,13 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"strconv"
 )
 
-func JsonScan[T any](src interface{}, b T) error {
+// JSONB is a jsonb array type for postgres with methods to save and read from db
+type JSONB []interface{}
+
+// Scan reads data from database and unmarshall it to struct field
+func (b *JSONB) Scan(src interface{}) error {
 	switch src := src.(type) {
 	case []byte:
 		if string(src) == "null" {
@@ -22,12 +25,7 @@ func JsonScan[T any](src interface{}, b T) error {
 	return fmt.Errorf("cannot convert %T", src)
 }
 
-type JSONB []interface{}
-
-func (b *JSONB) Scan(src interface{}) error {
-	return JsonScan(src, b)
-}
-
+// Value returns data to save to database
 func (b JSONB) Value() (driver.Value, error) {
 	if b == nil {
 		return json.Marshal([]interface{}{})
@@ -35,23 +33,7 @@ func (b JSONB) Value() (driver.Value, error) {
 	return json.Marshal(b)
 }
 
-func (b *JSONB) AsFloatSlice() []float64 {
-	arr := make([]float64, 0)
-	for _, value := range *b {
-		arr = append(arr, value.(float64))
-	}
-
-	return arr
-}
-
-func ParseInt(s string) int {
-	i, err := strconv.Atoi(s)
-	if err != nil {
-		panic(err)
-	}
-	return i
-}
-
+// ToGenericArray is a shortcut to represent array as interface
 func ToGenericArray[T any](arr []T) []interface{} {
 	res := make([]interface{}, len(arr))
 	for idx, v := range arr {

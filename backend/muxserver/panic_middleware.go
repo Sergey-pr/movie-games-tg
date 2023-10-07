@@ -1,54 +1,36 @@
 package muxserver
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"github.com/Sergey-pr/movie-games-tg/utils"
+	"github.com/Sergey-pr/movie-games-tg/muxserver/handlers"
 	"github.com/lib/pq"
-	"io"
 	"net/http"
 )
 
+// panicMiddleware is a middleware that returns errors in response
 func panicMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		payload, err := io.ReadAll(req.Body)
-		req.Body = io.NopCloser(bytes.NewReader(payload))
-		if err != nil {
-			panic(err)
-		}
 		defer func() {
-			r := recover()
-			if r != nil {
-
+			recoveredError := recover()
+			if recoveredError != nil {
 				var (
-					errDetails  interface{}
-					errHttpCode = http.StatusOK
+					errorText interface{}
+					errorCode = http.StatusInternalServerError
 				)
-
-				switch t := r.(type) {
+				// Switch by error type to get error text
+				switch err := recoveredError.(type) {
 				case *pq.Error:
-					errDetails = fmt.Sprintf("%s : %s", t.Code, t.Message)
-					errHttpCode = http.StatusBadRequest
-				case utils.ValidateError:
-					errHttpCode = http.StatusBadRequest
-					errDetails = utils.ValidateErrors{t}.Error()
-				case utils.ValidateErrors:
-					errHttpCode = http.StatusBadRequest
-					errDetails = t.Error()
+					errorText = fmt.Sprintf("%s: %s", err.Code, err.Message)
+					errorCode = http.StatusBadRequest
 				case string:
-					errDetails = t
+					errorText = err
 				case error:
-					errDetails = t.Error()
+					errorText = err.Error()
 				default:
-					errDetails = "Unknown error"
+					errorText = "Undefined error"
 				}
-
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(errHttpCode)
-				_ = json.NewEncoder(w).Encode(struct {
-					Message interface{} `json:"error"`
-				}{errDetails})
+				// Respond with error text
+				handlers.JsonResponse(w, map[string]string{"error": fmt.Sprintf("%v", errorText)}, errorCode)
 			}
 		}()
 		h.ServeHTTP(w, req)

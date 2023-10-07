@@ -17,7 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
+	// Create to channel to catch interrupt command
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c

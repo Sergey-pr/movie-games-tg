@@ -9,9 +9,9 @@ type user struct {
 	TelegramId int    `json:"tg_id"`
 	Name       string `json:"name"`
 	Language   string `json:"language"`
-	Points     int    `json:"points"`
 }
 
+// User returns serialized user data, so we could marshal it in response
 func User(obj *models.User) *user {
 	return &user{
 		Id:         obj.Id,

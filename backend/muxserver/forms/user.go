@@ -5,17 +5,17 @@ type LoginForm struct {
 }
 
 type UserForm struct {
-	TelegramId int    `json:"id" validate:"required"`
-	Name       string `json:"first_name" validate:"required"`
+	TelegramId int    `json:"id"`
+	Name       string `json:"first_name"`
 	UserName   string `json:"username"`
-	Language   string `json:"language_code" validate:"required"`
+	Language   string `json:"language_code"`
 }
 
 type UserLang struct {
-	Language string `json:"language_code" validate:"required"`
+	Language string `json:"language_code"`
 }
 
 type UserAnswer struct {
-	CardId int `json:"card_id" validate:"required"`
-	Points int `json:"points" validate:"required"`
+	CardId int `json:"card_id"`
+	Points int `json:"points"`
 }

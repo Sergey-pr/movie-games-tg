@@ -1,5 +1,6 @@
 package forms
 
+// BotUpdate structure from telegram
 type BotUpdate struct {
 	UpdateId int `json:"update_id"`
 	Message  struct {

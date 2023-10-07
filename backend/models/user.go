@@ -6,7 +6,6 @@ import (
 	"github.com/Sergey-pr/movie-games-tg/persist"
 	"github.com/Sergey-pr/movie-games-tg/utils/jwt"
 	"github.com/doug-martin/goqu/v9"
-	"time"
 )
 
 const (
@@ -117,7 +116,7 @@ func (obj *User) GetBotProcessor(ctx context.Context, chatId int) (*CardProcesso
 }
 
 // GetJwtToken return JWT token to use as auth method
-func (obj *User) GetJwtToken() (string, time.Time, error) {
+func (obj *User) GetJwtToken() (string, error) {
 	return jwt.GetJwtToken(&jwt.Claims{
 		User: jwt.UserClaims{
 			Id:         obj.Id,

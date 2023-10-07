@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/Sergey-pr/movie-games-tg/models"
 	"github.com/Sergey-pr/movie-games-tg/muxserver/forms"
 	"github.com/Sergey-pr/movie-games-tg/utils"
+	"github.com/gorilla/mux"
 	"io"
 	"net/http"
 	"os"
@@ -13,10 +15,10 @@ import (
 // BotUpdates is handling bot commands
 func BotUpdates(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-
+	// Fill form struct with data from request and validate it
 	var form forms.BotUpdate
-	OrPanic(ValidateForm(r, &form))
-
+	OrPanic(json.NewDecoder(r.Body).Decode(&form))
+	// Get or create user
 	user, err := models.LoginUser(ctx, form.Message.From.Id)
 	if err != nil {
 		user = &models.User{
@@ -27,14 +29,14 @@ func BotUpdates(w http.ResponseWriter, r *http.Request) {
 		}
 		OrPanic(user.Save(ctx))
 	}
-
+	// Admin commands are working only for IsAdmin users
 	if user.IsAdmin {
 		processor := ObjOrPanic(user.GetBotProcessor(ctx, form.Message.Chat.Id))
 		OrPanic(processor.ProcessMsg(ctx, &form))
-		Ok(w)
+		CompletedResponse(w)
 		return
 	}
-
+	// Return default message
 	var textMsg string
 	if user.Language == "ru" {
 		textMsg = "*КИНОИГРЫ*🍿\n\nЧтобы начать игру нажмите Start\\!"
@@ -42,16 +44,15 @@ func BotUpdates(w http.ResponseWriter, r *http.Request) {
 		textMsg = "*MOVIEGAMES*🍿\n\nPress start to begin\\!"
 	}
 	OrPanic(utils.SendStartBotMessage(form.Message.Chat.Id, textMsg, "Start!"))
-
-	Ok(w)
+	CompletedResponse(w)
 }
 
-// BotImage returns image by id
+// BotImage returns image static link by id
 func BotImage(w http.ResponseWriter, r *http.Request) {
-	imageId := GetImageId(r)
-
+	imageId := mux.Vars(r)["image_id"]
+	// Open image by id, image filenames are id
 	img := ObjOrPanic(os.Open(fmt.Sprintf("card_files/%s", imageId)))
-	w.Header().Set("Content-Type", "image/jpeg") // <-- set the content-type header
+	// Set content-type header
+	w.Header().Set("Content-Type", "image/jpeg")
 	ObjOrPanic(io.Copy(w, img))
-
 }

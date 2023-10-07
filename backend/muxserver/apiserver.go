@@ -3,36 +3,33 @@ package muxserver
 import (
 	"context"
 	"github.com/Sergey-pr/movie-games-tg/muxserver/handlers"
+	muxhandlers "github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"os"
 	"time"
-
-	muxhandlers "github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
-	"github.com/rs/cors"
 )
 
+// ApiServer is a server object with Run and Shutdown methods
 type ApiServer struct {
-	name         string
-	router       *mux.Router
-	writeTimeout time.Duration
-	readTimeout  time.Duration
-	httpServer   *http.Server
+	router     *mux.Router
+	httpServer *http.Server
 }
 
+// NewApiServer returns ApiServer object with set up handlers
 func NewApiServer() *ApiServer {
+	router := mux.NewRouter().StrictSlash(true)
+	router.Use(panicMiddleware)
+	apiRouter := router.PathPrefix("/api").Subrouter()
 
-	rootRouter := mux.NewRouter().StrictSlash(true)
-	rootRouter.Use(panicMiddleware)
-	router := rootRouter.PathPrefix("/api").Subrouter()
-
-	public := router.PathPrefix("/public").Subrouter()
+	public := apiRouter.PathPrefix("/public").Subrouter()
 	public.HandleFunc("/login/", handlers.Login).Methods(http.MethodPost).Name("public:login")
 	public.HandleFunc("/bot-updates/", handlers.BotUpdates).Methods(http.MethodPost).Name("public:bot_updates")
 	public.HandleFunc("/bot-image/{image_id}/", handlers.BotImage).Methods(http.MethodGet).Name("public:bot_image")
 
-	private := router.PathPrefix("").Subrouter()
+	private := apiRouter.PathPrefix("").Subrouter()
 	private.Use(authMiddleware)
 
 	private.HandleFunc("/user/", handlers.UserInfo).Methods(http.MethodGet).Name("")
@@ -40,29 +37,23 @@ func NewApiServer() *ApiServer {
 	private.HandleFunc("/user/answer/", handlers.UserProcessAnswer).Methods(http.MethodPost).Name("")
 
 	private.HandleFunc("/cards/", handlers.CardsList).Methods(http.MethodGet).Name("")
-	private.HandleFunc("/cards/", handlers.CardCreate).Methods(http.MethodPost).Name("")
-	private.HandleFunc("/cards/{id}/", handlers.CardDelete).Methods(http.MethodDelete).Name("")
-	private.HandleFunc("/cards/{id}/", handlers.CardInfo).Methods(http.MethodGet).Name("")
-	private.HandleFunc("/cards/{id}/", handlers.CardUpdate).Methods(http.MethodPost).Name("")
 
 	private.HandleFunc("/leaderboard/", handlers.Leaderboard).Methods(http.MethodGet).Name("")
 
 	return &ApiServer{
-		name:   "API",
-		router: rootRouter,
+		router: router,
 	}
 }
 
+// Run starts the server
 func (s *ApiServer) Run(addr string) {
 	go func() {
 		s.httpServer = &http.Server{
-			ReadTimeout:  s.readTimeout,
-			WriteTimeout: s.writeTimeout,
-			Handler:      cors.AllowAll().Handler(muxhandlers.LoggingHandler(os.Stdout, s.router)),
-			Addr:         addr,
+			Handler: cors.AllowAll().Handler(muxhandlers.LoggingHandler(os.Stdout, s.router)),
+			Addr:    addr,
 		}
 
-		log.Printf("%s server listen: %s\n", s.name, addr)
+		log.Printf("server started at: %s\n", addr)
 
 		if err := s.httpServer.ListenAndServe(); err != nil {
 			log.Fatalln(err)
@@ -70,10 +61,9 @@ func (s *ApiServer) Run(addr string) {
 	}()
 }
 
+// Shutdown turns off the server with a 5-second delay to cancel shutdown
 func (s *ApiServer) Shutdown() {
-	log.Printf("%s server shutting down\n", s.name)
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	_ = s.httpServer.Shutdown(ctx)
-
 }

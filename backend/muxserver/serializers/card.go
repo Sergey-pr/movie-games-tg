@@ -26,6 +26,7 @@ type card struct {
 	TextColor        string      `json:"text_color"`
 }
 
+// Card returns serialized Card object
 func Card(obj *models.Card) *card {
 	return &card{
 		Id:               obj.Id,
@@ -49,9 +50,9 @@ func Card(obj *models.Card) *card {
 	}
 }
 
+// Cards return serialized Cards objects that are ready to marshal to response
 func Cards(objs []*models.Card) []*card {
 	cards := make([]*card, len(objs))
-
 	for i, obj := range objs {
 		cards[i] = Card(obj)
 	}
