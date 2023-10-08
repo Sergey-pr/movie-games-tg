@@ -1,24 +1,6 @@
-# movie-games-tg
+# MovieGames Telegram MiniApp
 
-## Project setup
-```
-npm install
-```
+MovieGames is a Telegram Mini App. It is fun to play,
+and you can use its source code to create your own Mini Apps.
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## How
