@@ -198,7 +198,7 @@ func SendStartBotMessage(ctx context.Context, chatId int, language string) error
 	return nil
 }
 
-// UploadNewFile uploads new file to telegram so we could use it later by id
+// UploadNewFile uploads new file to telegram, so we could use it later by id
 func UploadNewFile(ctx context.Context, url string, values map[string]io.Reader, filename string) error {
 	var (
 		err error
