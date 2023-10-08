@@ -85,12 +85,12 @@ export default {
       if (this.language === "ru") {
         this.welcomeMessage = "Привет "
         this.description = "Давай сыграем в игру на знание известных фильмов. Здесь ты проверишь свои знания и узнаешь о новых интересных фильмах."
-        this.rulesLabel = "ПРАВИЛА"
+        this.rulesLabel = "КАК ИГРАТЬ"
         this.leaderboardLabel = "ЛУЧШИЕ ИГРОКИ"
       } else {
         this.welcomeMessage = "Welcome "
         this.description = "Let's see how good is your movie knowledge. You will try to guess movie names and learn about famous movies."
-        this.rulesLabel = "RULES"
+        this.rulesLabel = "HOW TO PLAY"
         this.leaderboardLabel = "LEADERBOARD"
       }
     },
