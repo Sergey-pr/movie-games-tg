@@ -16,7 +16,7 @@ English documentation is <a href=https://github.com/Sergey-pr/movie-games-tg/tre
 * Бэкенд построен на <a href=https://go.dev/>Go</a> с помощью 
   <a href=https://github.com/gorilla/mux#gorillamux>Gorilla Mux</a> 
   http сервера и <a href=https://github.com/doug-martin/goqu#readme>goqu</a>
-  для рабоыт с базой
+  для работы с базой
 * Фронтенд это приложение на <a href=https://vuejs.org/>Vue.js</a>
   фреймворке с <a href=https://router.vuejs.org/>Vue Router</a> и
   <a href=https://vuex.vuejs.org/>Vuex</a>.
