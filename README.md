@@ -2,6 +2,8 @@
 
 # MovieGames Telegram MiniApp
 
+Try it yourself here <a href=https://t.me/movie_games_tg_bot>@movie_games_tg_bot</a>
+
 MovieGames is a Telegram Mini App. It's a card game where your
 main objective is to guess movies by clues which are given to
 you. It's fun to play, and you can use its source code to

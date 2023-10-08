@@ -2,6 +2,9 @@ English documentation is <a href=https://github.com/Sergey-pr/movie-games-tg/tre
 
 # КИНОИГРЫ Telegram MiniApp
 
+Попробуйте поиграть здесь <a href=https://t.me/movie_games_tg_bot>@movie_games_tg_bot</a>
+
+
 КИНОИГРЫ это приложение для телеграма. Оно представляет собой карточную игру в которой 
 нужно угадать фильм по подсказкам. В неё интересно поиграть и вы можете использовать её 
 как основу, чтобы создать своё приложение.
