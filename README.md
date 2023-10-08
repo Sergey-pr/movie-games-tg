@@ -22,6 +22,79 @@ create your own Mini Apps.
 * Database is <a href=https://www.postgresql.org/>PostgreSQL</a> with 
   <a href=https://github.com/amacneil/dbmate#dbmate>Dbmate</a> for migrations
 
+## Backend
+
+Backend is separated to modules:
+* **Models** - Object Related Mapping to database tables. Each model has methods for
+  creating, updating and deleting an object. There are also functions to get object from
+  database.
+* **Forms** - Objects which represent data from requests to backend. We usually parse 
+  request data to form, and then work with form object.
+* **Serializers** - Objects which represent response data from backend. We usually get
+  model from database and then serialize it before sending back to frontend or
+  telegram bot api.
+* **Handlers** - Functions to process requests to backend.
+
+You can also notice next folders in the backend:
+* **bot_files** - Here we have files that are used for bot responds.
+* **card_files** - Here we save cards images to use later on the frontend.
+  You can find a handler which serves this images in handlers module.
+* **config** - Here we process Environment variables to use in the app.
+* **migrations** - Is a folder with
+  <a href=https://github.com/amacneil/dbmate#dbmate>Dbmate</a> migrations
+* **persist** - Here we have connections that persist while app is ruinning.
+  Right now it's only a database connection.
+* **utils** - Here store utils and helper functions.
+
+## Frontend
+
+Frontend consist of 3 main folders
+
+* **assets** - Static assets
+* **components** - Vue components
+* **services** - Utils and helpers
+
+There are 4 main components:
+
+* **LandingPage** - is a main page of the app, from here you can start the game,
+  open rules page or leaderboard page
+* **PlayGame** - is a main game component it loads a subcomponent depending on one of 3 states:
+1. State `play` - is showing **CardPage** component with questions
+2. State `info` - is showing **CardInfoPage** component which shows card movie info
+3. State `end` - is showing **TheEndPage** component which tells you how many points you've got
+* **RulesPage** - is showing page with hints how to play this game
+* **LeaderboardPage** - is a page showing players with mot points
+
+There are also a small **LoadingComponent** which is just a loader to use while app is loading
+
+Services are 2 files:
+* **api.js** - is an axios api instance with all the requests
+* **utils.js** - contains helper functions
+
+# App Workflow
+
+App works in 2 languages English and Russian depending on user's telegram language.
+You can also change language on app's main page.
+
+1. When typing `/start` to the bot, bot will respond with a welcome message using callback endpoint
+   `POST /api/public/bot-updates/`
+2. On load we get telegram `initData` and send it to backend `POST /api/public/login/`
+   where we validate it by hash, and if it is valid, we send JWT token in response
+   to confirm that requests go from telegram users. Frontend stores JWT token and
+   uses it for all private api requests.
+3. On top of the main page there is a language switch. On switch we send request to save
+   user's preferred language `POST /api/user/lang/`
+4. When we press the play button, we go the PlayGame page, where frontend sends request
+   to get all the cards `GET /api/cards/` then shuffle it and shows the first card.
+5. Cards images are stored by ids, and we serve them from backend with
+   `GET /api/public/bot-image/{image_id}/`
+6. After user answered right or wrong we send request to save how many points user
+   have got `POST /api/user/answer/` and show card info page.
+7. When user answered on all the cards we show how many points user have got. From there
+   user can go back to main page.
+8. From main page user can go to the rules page which is static or leaderboard. 
+   Leaderboard info we get with a `GET /api/leaderboard/` method.
+
 # Usage
 
 ## Docker compose
@@ -83,6 +156,7 @@ POSTGRES_DB=movie_games
 5. It will automatically assign telegram bot callbacks, but you need to manually
    set your bot menu button with @BotFather telegram bot  if you want to open web app
    with menu button.
+
 </details>
 
 ## Run everything yourself
@@ -192,5 +266,7 @@ VUE_APP_BASE_URL=https://7cc1-188-233-88-176.ngrok-free.app
 6. Run frontend with `npm run dev` to generate dist
 7. Serve frontend with <a href=https://www.npmjs.com/package/serve>serve</a>
    by running `serve -l 8080` in the frontend folder
-8. Register frontend address as app url at @BotFather 
+8. Register frontend ngrok address as app menu button url at @BotFather 
+9. Now you can develop/debug app. More on debugging telegram apps you can see here
+   <a href=https://core.telegram.org/bots/webapps#testing-mini-apps>Testing Mini Apps</a>
 </details>
