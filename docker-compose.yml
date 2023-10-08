@@ -60,5 +60,6 @@ services:
 
 volumes:
   pgdata:
+  card_files:
 
 
