@@ -12,12 +12,17 @@ services:
   api:
     build: backend
     environment:
-      - DATABASE='user=sergei password=regedit257 host=localhost port=5432 dbname=movie_games sslmode=disable'
+      - DATABASE='user=postgres password=postgres host=localhost port=5432 dbname=movie_games sslmode=disable'
+      - JWT_TOKEN=sfhjahkfg8749GHGJHgjhds
+      - TELEGRAM_BOT_TOKEN=123456789:qwertyuioASDFGHJKLzxcvbnm
+      - FRONTEND_HOSTNAME=localhost:8080
+      - BACKEND_HOSTNAME=localhost:8888
     depends_on:
       migrator:
         condition: service_completed_successfully
     volumes:
       - ./card_files:/card_files
+      - ./bot_files:/bot_files
     ports:
       - "8888:8888"
 
@@ -55,3 +60,5 @@ services:
 
 volumes:
   pgdata:
+
+
