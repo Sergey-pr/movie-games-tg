@@ -41,10 +41,15 @@ You can also notice next folders in the backend:
   You can find a handler which serves this images in handlers module.
 * **config** - Here we process Environment variables to use in the app.
 * **migrations** - Is a folder with
-  <a href=https://github.com/amacneil/dbmate#dbmate>Dbmate</a> migrations
-* **persist** - Here we have connections that persist while app is ruinning.
+  <a href=https://github.com/amacneil/dbmate#dbmate>Dbmate</a> migrations.
+* **persist** - Here we have connections that persist while app is running.
   Right now it's only a database connection.
 * **utils** - Here store utils and helper functions.
+
+In the models there are special model which is called **CardProcessor**.
+It's a state machine which lets you add new cards in the bot chat.
+There are 16 states one for each of the cards fields. Some fields are duplicating 
+for translations, these fields have affixes `en` or `ru`.
 
 ## Frontend
 
@@ -71,30 +76,48 @@ Services are 2 files:
 * **api.js** - is an axios api instance with all the requests
 * **utils.js** - contains helper functions
 
+## Database
+
+Database consist of 6 tables
+
+* **answers** - saves how many points each user got on each card for teh first time
+  for the leaderboard.
+* **bot_files** - saves telegram file ids, so we don't upload files for every response
+  and just use already uploaded files.
+* **card_processors** - saves state for card processor for user
+* **cards** - saves cards data some fields are duplicating with different affixes `ru` and `en`
+  for translations.
+* **schema_migrations** - saves applied migrations to database, it is a
+  <a href=https://github.com/amacneil/dbmate#dbmate>Dbmate</a> technical table
+* **users** - saves users data like username or preferred language
+
 # App Workflow
 
 App works in 2 languages English and Russian depending on user's telegram language.
 You can also change language on app's main page.
 
-1. When typing `/start` to the bot, bot will respond with a welcome message using callback endpoint
+1. On backend load we send request to register callbacks to backend `bot-updates` handler.
+2. When typing `/start` to the bot, bot will respond with a welcome message using callback endpoint
    `POST /api/public/bot-updates/`
-2. On load we get telegram `initData` and send it to backend `POST /api/public/login/`
+3. On app load we get telegram `initData` and send it to backend `POST /api/public/login/`
    where we validate it by hash, and if it is valid, we send JWT token in response
    to confirm that requests go from telegram users. Frontend stores JWT token and
    uses it for all private api requests.
-3. On top of the main page there is a language switch. On switch we send request to save
+4. On top of the main page there is a language switch. On switch we send request to save
    user's preferred language `POST /api/user/lang/`
-4. When we press the play button, we go the PlayGame page, where frontend sends request
+5. When we press the play button, we go the PlayGame page, where frontend sends request
    to get all the cards `GET /api/cards/` then shuffle it and shows the first card.
-5. Cards images are stored by ids, and we serve them from backend with
+6. Cards images are stored by ids, and we serve them from backend with
    `GET /api/public/bot-image/{image_id}/`
-6. After user answered right or wrong we send request to save how many points user
+7. After user answered right or wrong we send request to save how many points user
    have got `POST /api/user/answer/` and show card info page.
-7. When user answered on all the cards we show how many points user have got. From there
+8. When user answered on all the cards we show how many points user have got. From there
    user can go back to main page.
-8. From main page user can go to the rules page which is static or leaderboard. 
+9. From main page user can go to the rules page which is static or leaderboard. 
    Leaderboard info we get with a `GET /api/leaderboard/` method.
-
+10. If you set yourself as admin (database table `users` column `is_admin` set `true`) you
+    can use bot command `/add` which will guide you through process of adding new cards
+    to the game.
 # Usage
 
 ## Docker compose
@@ -105,11 +128,12 @@ docker-compose.yml</a> file.
 
 <details><summary><b>Show instructions</b></summary>
 
-1. Make a copy of
+1. Setup <a href=https://www.docker.com/>Docker</a> and make sure you've got 
+   <a href=https://docs.docker.com/compose/gettingstarted/>Docker Compose</a> with it.
+2. Make a copy of
    <a href=https://github.com/Sergey-pr/movie-games-tg/blob/main/docker-compose.yml>
    docker-compose.yml</a> and name it docker-compose.yml.local
-2. Edit **Environment Variables** to suit your needs
-
+3. Edit **Environment Variables** to suit your needs
 ```dotenv
 # frontend
 
@@ -150,10 +174,10 @@ POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_DB=movie_games
 ```
-
-3. Run `docker-compose -f docker-compose.yml.local build` to build your containers
-4. Run `docker-compose -f docker-compose.yml.local up -d` to run your project
-5. It will automatically assign telegram bot callbacks, but you need to manually
+4. Edit `nginx.conf` file to suit your needs
+5. Run `docker-compose -f docker-compose.yml.local build` to build your containers
+6. Run `docker-compose -f docker-compose.yml.local up -d` to run your project
+7. It will automatically assign telegram bot callbacks, but you need to manually
    set your bot menu button with @BotFather telegram bot  if you want to open web app
    with menu button.
 
@@ -167,7 +191,7 @@ For development/debugging you can run everything separately.
 
 <details><summary><b>Show instructions</b></summary>
 
-1. Create your postgres database
+1. Create your <a href=https://www.postgresql.org/>PostgreSQL</a> database
 2. Install <a href=https://github.com/amacneil/dbmate#dbmate>Dbmate</a>
 3. In the backend folder set your .env file with 
    <a href=https://github.com/amacneil/dbmate#dbmate>Dbmate</a> 
@@ -189,7 +213,8 @@ DATABASE_URL=postgres://postgres:postgres@db:5432/movie_games?sslmode=disable
 <details><summary><b>Show instructions</b></summary>
 
 1. Setup <a href=https://go.dev/>Go</a> 1.20 or newer
-2. Export your Environment Variables
+2. Go to the backend folder
+3. Export your Environment Variables
 ```dotenv
 # REST_LISTEN is adress at which web server will listen to requests
 REST_LISTEN=0.0.0.0:8888
@@ -205,8 +230,8 @@ FRONTEND_HOSTNAME=localhost:8080
 # BACKEND_HOSTNAME is your backend address
 BACKEND_HOSTNAME=localhost:8888
 ```
-3. Run `go mod download` to download all the dependecies
-4. Run `go build main.go` this will run your backend web server
+4. Run `go mod download` to download all the dependencies 
+5. Run `go build main.go` this will run your backend web server
 
 </details>
 
@@ -214,8 +239,8 @@ BACKEND_HOSTNAME=localhost:8888
 
 <details><summary><b>Show instructions</b></summary>
 
-1. Install <a href=https://nodejs.org/en>Node</a>
-2. Go to frontend folder
+1. Install <a href=https://nodejs.org/en>Node.js</a>
+2. Go to the frontend folder
 3. Run `npm install` to install all the dependencies
 4. Run `npm run serve` to serve frontend on localhost. You can also use
    `npm run dev` which will build dist and auto update dist with all the changes 
@@ -270,3 +295,7 @@ VUE_APP_BASE_URL=https://7cc1-188-233-88-176.ngrok-free.app
 9. Now you can develop/debug app. More on debugging telegram apps you can see here
    <a href=https://core.telegram.org/bots/webapps#testing-mini-apps>Testing Mini Apps</a>
 </details>
+
+***
+
+Made in 2 weeks for Telegram Mini Apps Contest.
