@@ -299,3 +299,7 @@ VUE_APP_BASE_URL=https://7cc1-188-233-88-176.ngrok-free.app
 9. Теперь можете открыть приложение через telegram. Больше информации по отладке приложений в телеграм 
    <a href=https://core.telegram.org/bots/webapps#testing-mini-apps>Здесь</a>
 </details>
+
+***
+
+Сделано за 2 недели специально для Telegram Mini Apps Contest.
