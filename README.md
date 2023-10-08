@@ -1,3 +1,5 @@
+Инструкция на русском языке <a href=https://github.com/Sergey-pr/movie-games-tg/blob/main/README_RU.md#%D0%BA%D0%B8%D0%BD%D0%BE%D0%B8%D0%B3%D1%80%D1%8B-telegram-miniapp>тут</a>
+
 # MovieGames Telegram MiniApp
 
 MovieGames is a Telegram Mini App. It's a card game where your
