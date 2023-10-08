@@ -1,3 +1,5 @@
+English documentation is <a href=https://github.com/Sergey-pr/movie-games-tg/tree/main#moviegames-telegram-miniapp>here</a>
+
 # КИНОИГРЫ Telegram MiniApp
 
 КИНОИГРЫ это приложение для телеграма. Оно представляет собой карточную игру в которой 
