@@ -2,7 +2,7 @@
   <div class="question-card" ref="questionCard" tabIndex="1">
     <div class="card-block">
       <div class="content-block">
-        <img alt="drawing" class="drawing" :src="imgUrlPrefix + card.drawing_id">
+        <img alt="drawing" class="drawing" :src="imgUrlPrefix + card.drawing_id + '/'">
       </div>
       <p class="block-label">{{ drawingTitle }}</p>
     </div>
@@ -14,7 +14,7 @@
     </div>
     <div id="section1" class="card-block" v-if="points <= 1">
       <div class="content-block">
-        <img alt="pixelated" class="pixelated" :src="imgUrlPrefix + card.pixelated_id">
+        <img alt="pixelated" class="pixelated" :src="imgUrlPrefix + card.pixelated_id + '/'">
       </div>
       <p class="block-label">{{ pixelatedTitle }}</p>
     </div>

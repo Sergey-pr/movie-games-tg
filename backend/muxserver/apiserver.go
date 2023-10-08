@@ -27,7 +27,7 @@ func NewApiServer() *ApiServer {
 	public := apiRouter.PathPrefix("/public").Subrouter()
 	public.HandleFunc("/login/", handlers.Login).Methods(http.MethodPost).Name("public:login")
 	public.HandleFunc("/bot-updates/", handlers.BotUpdates).Methods(http.MethodPost).Name("public:bot_updates")
-	public.HandleFunc("/bot-image/{image_id}", handlers.BotImage).Methods(http.MethodGet).Name("public:bot_image")
+	public.HandleFunc("/bot-image/{image_id}/", handlers.BotImage).Methods(http.MethodGet).Name("public:bot_image")
 
 	private := apiRouter.PathPrefix("").Subrouter()
 	private.Use(authMiddleware)

@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <img id="screenshot" alt="screenshot" class="screenshot" :src="imgUrlPrefix + card.screenshot_id">
+    <img id="screenshot" alt="screenshot" class="screenshot" :src="imgUrlPrefix + card.screenshot_id + '/'">
     <h2 class="name">{{ name }}</h2>
     <h3 class="name-ru">{{ name_ru }}</h3>
     <p class="desc">{{ desc }}</p>
