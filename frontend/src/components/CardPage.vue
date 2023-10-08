@@ -257,7 +257,8 @@ export default {
   color: #ffffff;
   background-color: #433789;
   font-weight: normal;
-  font-size: 25px;
+  font-size: 20px;
+  padding: 5px;
 }
 
 .quote {

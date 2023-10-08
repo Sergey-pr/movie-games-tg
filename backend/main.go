@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/Sergey-pr/movie-games-tg/config"
+	"github.com/Sergey-pr/movie-games-tg/models"
 	"github.com/Sergey-pr/movie-games-tg/muxserver"
-	"github.com/Sergey-pr/movie-games-tg/utils"
 	"os"
 	"os/signal"
 )
@@ -13,7 +13,7 @@ func main() {
 	api.Run(config.AppConfig.RestListen)
 
 	// Register callback for telegram bot
-	err := utils.RegisterCallback()
+	err := models.RegisterCallback()
 	if err != nil {
 		panic(err)
 	}

@@ -57,7 +57,7 @@ func GetUserByTelegramId(ctx context.Context, telegramId int) (*User, error) {
 		return nil, err
 	}
 	if exists == false {
-		return nil, errors.New("user not found")
+		return nil, nil
 	}
 	return &obj, nil
 }
@@ -72,7 +72,7 @@ func GetUserById(ctx context.Context, userId int) (*User, error) {
 		return nil, err
 	}
 	if exists == false {
-		return nil, errors.New("user not found")
+		return nil, nil
 	}
 	return &obj, nil
 }

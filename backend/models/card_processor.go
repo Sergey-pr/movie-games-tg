@@ -166,7 +166,7 @@ func (obj *CardProcessor) processAddTextColor(ctx context.Context, msg string) e
 	} else {
 		answer = fmt.Sprintf("Color: %s\n\nThe card is ready!", msg)
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -195,7 +195,7 @@ func (obj *CardProcessor) processAddBackgroundColor2(ctx context.Context, msg st
 	} else {
 		answer = fmt.Sprintf("Color: %s\n\nNow let's add the text color!", msg)
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -221,7 +221,7 @@ func (obj *CardProcessor) processAddBackgroundColor1(ctx context.Context, msg st
 	} else {
 		answer = fmt.Sprintf("Color: %s\n\nNow type the second background color.", msg)
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -253,7 +253,7 @@ func (obj *CardProcessor) processAddScreenshot(ctx context.Context, form *forms.
 		} else {
 			answer = "Please attach image to the message as a file."
 		}
-		err := utils.SendBotMessage(obj.ChatId, answer)
+		err := SendBotMessage(obj.ChatId, answer)
 		if err != nil {
 			return err
 		}
@@ -265,7 +265,7 @@ func (obj *CardProcessor) processAddScreenshot(ctx context.Context, form *forms.
 	} else {
 		answer = "Image saved.\n\nNow let's add a first color for background gradient. (#FF00FF)"
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -276,7 +276,7 @@ func (obj *CardProcessor) processAddScreenshot(ctx context.Context, form *forms.
 		return err
 	}
 
-	err = utils.DownloadBotImage(imageId)
+	err = DownloadBotImage(imageId)
 	if err != nil {
 		return err
 	}
@@ -302,7 +302,7 @@ func (obj *CardProcessor) processAddPixelated(ctx context.Context, form *forms.B
 		} else {
 			answer = "Please attach image to the message as a file."
 		}
-		err := utils.SendBotMessage(obj.ChatId, answer)
+		err := SendBotMessage(obj.ChatId, answer)
 		if err != nil {
 			return err
 		}
@@ -314,7 +314,7 @@ func (obj *CardProcessor) processAddPixelated(ctx context.Context, form *forms.B
 	} else {
 		answer = "Image saved.\n\nNow let's add a screenshot from movie."
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -325,7 +325,7 @@ func (obj *CardProcessor) processAddPixelated(ctx context.Context, form *forms.B
 		return err
 	}
 
-	err = utils.DownloadBotImage(imageId)
+	err = DownloadBotImage(imageId)
 	if err != nil {
 		return err
 	}
@@ -351,7 +351,7 @@ func (obj *CardProcessor) processAddDrawing(ctx context.Context, form *forms.Bot
 		} else {
 			answer = "Please attach image to the message as a file."
 		}
-		err := utils.SendBotMessage(obj.ChatId, answer)
+		err := SendBotMessage(obj.ChatId, answer)
 		if err != nil {
 			return err
 		}
@@ -363,7 +363,7 @@ func (obj *CardProcessor) processAddDrawing(ctx context.Context, form *forms.Bot
 	} else {
 		answer = "Image saved.\n\nNow let's add a pixelated image."
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -374,7 +374,7 @@ func (obj *CardProcessor) processAddDrawing(ctx context.Context, form *forms.Bot
 		return err
 	}
 
-	err = utils.DownloadBotImage(imageId)
+	err = DownloadBotImage(imageId)
 	if err != nil {
 		return err
 	}
@@ -409,7 +409,7 @@ func (obj *CardProcessor) processAddRussianFacts(ctx context.Context, msg string
 		}
 	}
 
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -431,7 +431,7 @@ func (obj *CardProcessor) processAddEnglishFacts(ctx context.Context, msg string
 	} else {
 		answer = fmt.Sprintf("Intereting facts:\n%s\n\nDo you want to add facts in russian?\n\nAnswer \"No\" if you don't need russian answers or type russian facts.", strings.Join(facts, "\n"))
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -467,7 +467,7 @@ func (obj *CardProcessor) processAddRussianAnswers(ctx context.Context, msg stri
 			} else {
 				errMsg = fmt.Sprintf("You need to write 5 variants with comma between them. You've written %d variants.", len(answers))
 			}
-			err := utils.SendBotMessage(obj.ChatId, errMsg)
+			err := SendBotMessage(obj.ChatId, errMsg)
 			if err != nil {
 				return err
 			}
@@ -484,7 +484,7 @@ func (obj *CardProcessor) processAddRussianAnswers(ctx context.Context, msg stri
 		}
 	}
 
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -506,7 +506,7 @@ func (obj *CardProcessor) processAddEnglishAnswers(ctx context.Context, msg stri
 		} else {
 			errMsg = fmt.Sprintf("You need to write 5 variants with comma between them. You've written %d variants.", len(answers))
 		}
-		err := utils.SendBotMessage(obj.ChatId, errMsg)
+		err := SendBotMessage(obj.ChatId, errMsg)
 		if err != nil {
 			return err
 		}
@@ -518,7 +518,7 @@ func (obj *CardProcessor) processAddEnglishAnswers(ctx context.Context, msg stri
 	} else {
 		answer = fmt.Sprintf("Answer variants:\n%s\n\nDo you want to add answers in russian?\n\nAnswer \"No\" if you don't need russian answers or type russian answers.", strings.Join(answers, "\n"))
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -558,7 +558,7 @@ func (obj *CardProcessor) processAddRussianQuote(ctx context.Context, msg string
 		}
 	}
 
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -578,7 +578,7 @@ func (obj *CardProcessor) processAddEnglishQuote(ctx context.Context, msg string
 	} else {
 		answer = fmt.Sprintf("The quote is: %s\n\nDo you want to add quote in russian?\n\nAnswer \"No\" if you don't need russian quote or answer with the russian quote.", msg)
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -618,7 +618,7 @@ func (obj *CardProcessor) processAddRussianDesc(ctx context.Context, msg string)
 		}
 	}
 
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -638,7 +638,7 @@ func (obj *CardProcessor) processAddEnglishDesc(ctx context.Context, msg string)
 	} else {
 		answer = fmt.Sprintf("The description is: %s\n\nDo you want to add russian movie description?\n\nAnswer \"No\" if you don't need russian movie description or answer with the russian movie description.", msg)
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -678,7 +678,7 @@ func (obj *CardProcessor) processAddRussianName(ctx context.Context, msg string)
 		}
 	}
 
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -698,7 +698,7 @@ func (obj *CardProcessor) processAddEnglishName(ctx context.Context, msg string)
 	} else {
 		answer = fmt.Sprintf("The name is: %s\n\nDo you want to add russian movie name?\n\nAnswer \"No\" if you don't need russian movie name or answer with the russian movie name.", msg)
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -731,7 +731,7 @@ func (obj *CardProcessor) processAddCard(ctx context.Context) error {
 	} else {
 		answer = "Let's create a new card, to stop send /stop\n\nWhat's the card's english movie name?"
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -751,7 +751,7 @@ func (obj *CardProcessor) sendStopMessage() error {
 	} else {
 		answer = "Creating of a new card is stopped"
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -765,7 +765,7 @@ func (obj *CardProcessor) sendDefaultMessage() error {
 	} else {
 		answer = "Click \"Start\" button to open the game"
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}
@@ -779,7 +779,7 @@ func (obj *CardProcessor) processError() error {
 	} else {
 		answer = "Can't understand answer"
 	}
-	err := utils.SendBotMessage(obj.ChatId, answer)
+	err := SendBotMessage(obj.ChatId, answer)
 	if err != nil {
 		return err
 	}

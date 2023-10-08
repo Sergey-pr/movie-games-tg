@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/Sergey-pr/movie-games-tg/models"
 	"github.com/Sergey-pr/movie-games-tg/muxserver/forms"
-	"github.com/Sergey-pr/movie-games-tg/utils"
 	"github.com/gorilla/mux"
 	"io"
 	"net/http"
@@ -36,14 +35,8 @@ func BotUpdates(w http.ResponseWriter, r *http.Request) {
 		CompletedResponse(w)
 		return
 	}
-	// Return default message
-	var textMsg string
-	if user.Language == "ru" {
-		textMsg = "*КИНОИГРЫ*🍿\n\nЧтобы начать игру нажмите Start\\!"
-	} else {
-		textMsg = "*MOVIEGAMES*🍿\n\nPress start to begin\\!"
-	}
-	OrPanic(utils.SendStartBotMessage(form.Message.Chat.Id, textMsg, "Start!"))
+
+	OrPanic(models.SendStartBotMessage(ctx, form.Message.Chat.Id, user.Language))
 	CompletedResponse(w)
 }
 
