@@ -68,6 +68,7 @@ export default {
       // Get user data
       response = await privateApi().getUser(response.data["token"]);
       this.user = response.data
+      console.log(response.data)
       this.userName = response.data["name"]
       this.language = response.data["language"]
       this.$store.commit('setUser', response.data)

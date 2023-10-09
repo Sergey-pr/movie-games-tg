@@ -6,6 +6,7 @@ import (
 	"github.com/lib/pq"
 	"log"
 	"net/http"
+	"runtime/debug"
 )
 
 // panicMiddleware is a middleware that returns errors in response
@@ -27,6 +28,7 @@ func panicMiddleware(h http.Handler) http.Handler {
 					errorText = "Undefined error"
 				}
 				log.Printf("%v", errorText)
+				log.Println(string(debug.Stack()))
 				// Respond with error text
 				handlers.JsonResponse(w, map[string]string{"error": fmt.Sprintf("%v", errorText)}, http.StatusOK)
 			}
