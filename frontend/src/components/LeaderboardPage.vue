@@ -4,7 +4,7 @@
     <p class="leaderboard-desc">{{ desc }}</p>
     <p class="leaderboard-label">{{ leaderboardLabel }}</p>
     <p class="leaderboard-text" :key="index" v-for="(data, index) in usersData">
-      {{ data.name }}:&nbsp;{{ data.points }}
+      {{ index + 1 }}. {{ data.name }}  {{ data.last_name }}:&nbsp;{{ data.points }}
     </p>
   </div>
 </template>

@@ -5,10 +5,11 @@ type LoginForm struct {
 }
 
 type UserForm struct {
-	TelegramId int    `json:"id"`
-	Name       string `json:"first_name"`
-	UserName   string `json:"username"`
-	Language   string `json:"language_code"`
+	TelegramId int     `json:"id"`
+	Name       string  `json:"first_name"`
+	LastName   *string `json:"last_name"`
+	UserName   string  `json:"username"`
+	Language   string  `json:"language_code"`
 }
 
 type UserLang struct {

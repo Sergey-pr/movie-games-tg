@@ -14,12 +14,13 @@ const (
 )
 
 type User struct {
-	Id         int    `db:"id" goqu:"skipupdate,skipinsert"`
-	TelegramId int    `db:"telegram_id"`
-	Name       string `db:"name"`
-	UserName   string `db:"username"`
-	Language   string `db:"language"`
-	IsAdmin    bool   `db:"is_admin"`
+	Id         int     `db:"id" goqu:"skipupdate,skipinsert"`
+	TelegramId int     `db:"telegram_id"`
+	Name       string  `db:"name"`
+	LastName   *string `db:"last_name"`
+	UserName   string  `db:"username"`
+	Language   string  `db:"language"`
+	IsAdmin    bool    `db:"is_admin"`
 }
 
 // LoginUser find user in DB and check password
@@ -32,7 +33,8 @@ func LoginUser(ctx context.Context, telegramId int) (*User, error) {
 	return user, nil
 }
 
-func GetUsersNamesByIds(ctx context.Context, ids []int) (map[int]string, error) {
+// GetUsersCache returns cache of users by user id
+func GetUsersCache(ctx context.Context, ids []int) (map[int]*User, error) {
 	var objs []*User
 	err := persist.Db.From(UsersTableName).Where(
 		goqu.Ex{"id": ids},
@@ -40,9 +42,9 @@ func GetUsersNamesByIds(ctx context.Context, ids []int) (map[int]string, error) 
 	if err != nil {
 		return nil, err
 	}
-	data := make(map[int]string)
+	data := make(map[int]*User)
 	for _, obj := range objs {
-		data[obj.Id] = obj.Name
+		data[obj.Id] = obj
 	}
 	return data, nil
 }

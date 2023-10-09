@@ -6,8 +6,9 @@ import (
 )
 
 type userData struct {
-	Name   string `json:"name"`
-	Points int    `json:"points"`
+	Name     string `json:"name"`
+	LastName string `json:"last_name"`
+	Points   int    `json:"points"`
 }
 
 // Leaderboards returns serialized users data with their highest scores
@@ -18,17 +19,22 @@ func Leaderboards(ctx context.Context, pointsData []*models.UserData) ([]*userDa
 		usersIds[i] = obj.UserId
 	}
 	// Get usernames cache as map[userId]username to use later
-	usersNamesCache, err := models.GetUsersNamesByIds(ctx, usersIds)
+	usersCache, err := models.GetUsersCache(ctx, usersIds)
 	if err != nil {
 		return nil, err
 	}
 	// Serialize data getting user names from cache
 	data := make([]*userData, len(pointsData))
 	for i, userPoints := range pointsData {
-		data[i] = &userData{
-			Name:   usersNamesCache[userPoints.UserId],
+		userDataObj := &userData{
+			Name: usersCache[userPoints.UserId].Name,
+
 			Points: userPoints.TotalPoints,
 		}
+		if usersCache[userPoints.UserId].LastName != nil {
+			userDataObj.LastName = *usersCache[userPoints.UserId].LastName
+		}
+		data[i] = userDataObj
 	}
 	return data, nil
 }

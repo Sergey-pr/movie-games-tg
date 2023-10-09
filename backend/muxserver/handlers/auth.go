@@ -41,6 +41,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			UserName:   userForm.UserName,
 			Language:   userForm.Language,
 		}
+		if userForm.LastName != nil {
+			user.LastName = userForm.LastName
+		}
+		OrPanic(user.Save(ctx))
+	}
+	if user.LastName == nil && userForm.LastName != nil {
+		user.LastName = userForm.LastName
 		OrPanic(user.Save(ctx))
 	}
 	// Return jwt token
