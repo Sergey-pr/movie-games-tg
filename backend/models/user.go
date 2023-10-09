@@ -26,7 +26,7 @@ type User struct {
 // LoginUser find user in DB and check password
 func LoginUser(ctx context.Context, telegramId int) (*User, error) {
 	user, err := GetUserByTelegramId(ctx, telegramId)
-	if err != nil {
+	if err != nil || user == nil {
 		return nil, err
 	}
 	ctx = context.WithValue(ctx, "user", user)

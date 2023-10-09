@@ -19,7 +19,7 @@ func BotUpdates(w http.ResponseWriter, r *http.Request) {
 	OrPanic(json.NewDecoder(r.Body).Decode(&form))
 	// Get or create user
 	user, err := models.LoginUser(ctx, form.Message.From.Id)
-	if err != nil {
+	if err != nil || user == nil {
 		user = &models.User{
 			TelegramId: form.Message.From.Id,
 			Name:       form.Message.From.FirstName,

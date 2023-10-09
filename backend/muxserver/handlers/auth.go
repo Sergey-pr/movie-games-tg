@@ -33,7 +33,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	OrPanic(json.Unmarshal([]byte(initData.Get("user")), &userForm))
 	// Check if user exist
 	user, err := models.LoginUser(ctx, userForm.TelegramId)
-	if err != nil {
+	if err != nil || user == nil {
 		// Create new user
 		user = &models.User{
 			TelegramId: userForm.TelegramId,
