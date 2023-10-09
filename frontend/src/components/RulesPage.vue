@@ -108,7 +108,7 @@ body {
 .rules-text {
   margin: 10px;
   color: white;
-  text-align: justify;
+  text-align: start;
 }
 
 #rules-label {
