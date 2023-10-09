@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/Sergey-pr/movie-games-tg/muxserver/handlers"
 	"github.com/lib/pq"
+	"log"
 	"net/http"
 )
 
@@ -25,6 +26,7 @@ func panicMiddleware(h http.Handler) http.Handler {
 				default:
 					errorText = "Undefined error"
 				}
+				log.Printf("%v", errorText)
 				// Respond with error text
 				handlers.JsonResponse(w, map[string]string{"error": fmt.Sprintf("%v", errorText)}, http.StatusOK)
 			}
