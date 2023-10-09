@@ -67,8 +67,11 @@ export default {
       this.$store.commit('setJwt', response.data["token"])
       // Get user data
       response = await privateApi().getUser(response.data["token"]);
+      // if login failed
+      if (response.data["error"] !== undefined) {
+        return
+      }
       this.user = response.data
-      console.log(response.data)
       this.userName = response.data["name"]
       this.language = response.data["language"]
       this.$store.commit('setUser', response.data)
