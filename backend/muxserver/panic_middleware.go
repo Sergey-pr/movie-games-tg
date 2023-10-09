@@ -13,15 +13,11 @@ func panicMiddleware(h http.Handler) http.Handler {
 		defer func() {
 			recoveredError := recover()
 			if recoveredError != nil {
-				var (
-					errorText interface{}
-					errorCode = http.StatusInternalServerError
-				)
+				var errorText interface{}
 				// Switch by error type to get error text
 				switch err := recoveredError.(type) {
 				case *pq.Error:
 					errorText = fmt.Sprintf("%s: %s", err.Code, err.Message)
-					errorCode = http.StatusBadRequest
 				case string:
 					errorText = err
 				case error:
@@ -30,7 +26,7 @@ func panicMiddleware(h http.Handler) http.Handler {
 					errorText = "Undefined error"
 				}
 				// Respond with error text
-				handlers.JsonResponse(w, map[string]string{"error": fmt.Sprintf("%v", errorText)}, errorCode)
+				handlers.JsonResponse(w, map[string]string{"error": fmt.Sprintf("%v", errorText)}, http.StatusOK)
 			}
 		}()
 		h.ServeHTTP(w, req)
