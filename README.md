@@ -300,6 +300,16 @@ VUE_APP_BASE_URL=https://7cc1-188-233-88-176.ngrok-free.app
    <a href=https://core.telegram.org/bots/webapps#testing-mini-apps>Testing Mini Apps</a>
 </details>
 
+# Potential Errors
+
+## Database connection and migrations
+
+You might run into problem with **Environment Variables** when running project with `docker-compose.yml.local`.
+There might be error with connection to database or the `migrator` service.
+* To fix it remove all the `.env` files from backend and frontend directories. You **Environment Variables** values should be in
+  docker-compose.yml.local file
+
 ***
 
 Made in 2 weeks for Telegram Mini Apps Contest.
+

@@ -300,6 +300,15 @@ VUE_APP_BASE_URL=https://7cc1-188-233-88-176.ngrok-free.app
    <a href=https://core.telegram.org/bots/webapps#testing-mini-apps>Здесь</a>
 </details>
 
+# Возможные проблемы
+
+## Ошибки соединения с базой данных и миграциями
+
+При запуске проекта через `docker-compose.yml.local` возможно проблема с соединениями с базой
+данных. Возможно будет падать сервис `migrator`.
+* Чтобы это исправить удалите файлы `.env` из папок frontend и backend. Ваши **Переменные Окружения**
+  должны быть заполнены в файле `docker-compose.yml.local`
+
 ***
 
 Сделано за 2 недели специально для Telegram Mini Apps Contest.
